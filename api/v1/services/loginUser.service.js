@@ -17,7 +17,7 @@ const login_service = async (email, password) => {
         const token = jwt.sign({_id: user._id}, "secret")
         const data = {
             message: 'Login Successful',
-            user,
+            user: user,
             token: token
         }
 
