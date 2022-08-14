@@ -11,7 +11,7 @@ router.get('/user', verify_token, getUser)
 
 router.post('/register', CreateUser)
 router.post('/login', LoginUser)
-router.post('/verifyUser', verifyUser)
+router.post('/user/verify', verifyUser)
 
 router.put('/user/update', verify_token, updateUserFields)
 router.patch('/user/update/password', verify_token, changeUserPassword)

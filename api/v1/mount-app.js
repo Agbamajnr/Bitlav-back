@@ -9,7 +9,7 @@ module.exports = function mountApp(app) {
 
   app.use(cors({
     credentials: true,
-    origin: ['https://bitlav.netlify.app', 'http://localhost:8080', 'http://localhost:8080']
+    origin: ['https://bitlav.netlify.app', 'http://127.0.0.1:5174', 'http://127.0.0.1:5173']
   }));
   
   app.use(express.json());
