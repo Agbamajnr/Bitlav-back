@@ -74,10 +74,12 @@ const updateUserFields = async (req, res) => {
     if (!user) {
         return res.status(400).json({error: "User not found"})
     } else {
-        const data = await updateUser(req.body.firstname, req.body.lastname, req.body.email, user._id)
+        const data = await updateUser(req.body.firstname, req.body.lastname,  user._id)
+        const {password, ...info} = data
         res.status(200).send({
             success: true,
             message: 'Updated Successfully',
+            userData: info
         })
     }
 }
