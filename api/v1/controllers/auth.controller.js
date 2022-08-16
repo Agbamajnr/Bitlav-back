@@ -39,7 +39,7 @@ const LoginUser = async (req, res) => {
 }
 
 const verifyUser = async (req, res) => {
-    const user = await User.findById(req.body.id)
+    const user = await User.findOne({email: req.body.email })
     if (!user) {
         return res.status(400).json({error: "User not found"})
     } else {
@@ -50,6 +50,8 @@ const verifyUser = async (req, res) => {
         // // Decrypt
         // let bytes  = CryptoJS.AES.decrypt(encryptedOTP, 'bitlav');
         // var originalText = bytes.toString(CryptoJS.enc.Utf8);
+
+        
 
         res.status(200).send({
             success: true,

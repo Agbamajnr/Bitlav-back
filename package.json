@@ -9,6 +9,7 @@
   "author": "ulimhunyieagbama@gmail.com",
   "license": "ISC",
   "dependencies": {
+    "@emailjs/browser": "^3.6.2",
     "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
     "crypto-js": "^4.1.1",

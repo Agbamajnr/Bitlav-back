@@ -9,10 +9,12 @@ async function verifyUserWithOtp(id) {
     const otp = String(generateCode(5));
 
     let previousOTP = await otpCode.findOne({userId: id})
+
     let result;
 
     if (previousOTP !== null) {
         result = previousOTP;
+
         return result;
     } else {
         
@@ -22,6 +24,7 @@ async function verifyUserWithOtp(id) {
             createdAt: new Date(),
             expiresAt: new Date() + 36000,
         }) 
+
     
         result = await otpVerification.save()
         return result;
