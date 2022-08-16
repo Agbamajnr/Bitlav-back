@@ -61,6 +61,27 @@ const verifyUser = async (req, res) => {
     }
 }
 
+const verifyOTPsent = async (req, res) => {
+    const email = req.body.email;
+
+    const user = await User.findOne({email: email});
+
+    if (user.verified === false) {
+        user.verified = true;
+        user.save();
+
+        res.send({
+            message: "User verified Successfully",
+            user: user,
+            errorMsg: "OK"
+        })
+    } else res.send({
+        message: "User already verified",
+        user: user,
+        errorMsg: "False"
+    })
+}
+
 const changeUserPassword = async (req, res) => {
     const user = await User.findById(req.user._id);
     if (!user) {
@@ -77,7 +98,6 @@ const updateUserFields = async (req, res) => {
         return res.status(400).json({error: "User not found"})
     } else {
         const data = await updateUser(req.body.firstname, req.body.lastname,  user._id)
-        console.log(data)
         res.status(200).send({
             success: true,
             message: 'Updated Successfully',
@@ -93,5 +113,6 @@ module.exports = {
     LoginUser,
     verifyUser,
     updateUserFields,
-    changeUserPassword
+    changeUserPassword,
+    verifyOTPsent
 }
