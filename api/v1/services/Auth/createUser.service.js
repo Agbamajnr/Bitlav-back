@@ -1,5 +1,6 @@
 
-const User = require('../models/user.model');
+const User = require('../../models/user.model');
+const Referral = require('../../models/referral.model');
 const bcrypt = require('bcrypt');
 
 const generateCode = length => {
@@ -61,6 +62,22 @@ const run_service = async (currentDate, password, email, rfCode) => {
         const user = new User(data)
         try {
             const result = await user.save();
+
+            if (rfCode) {
+                //handle new refferrals
+                const referringUser = await User.findOne({referralCode: rfCode})
+                const referral = new Referral({
+                    userReffered: result.referralCode,
+                    userReffering: referringUser.referralCode,
+                    referralEarnings: 0,
+                    dateReffered:  currentDate
+                })
+                const refferalSaved = await referral.save()
+
+                referringUser.referrals.push(refferalSaved._id);
+                const userSettingSaved = await referringUser.save();
+            }
+
             return {
                 success: true,
                 error: null,

@@ -7,11 +7,12 @@ const CryptoJS = require("crypto-js");
 
 
 // services
-const run_service = require('../services/createUser.service');
-const login_service = require('../services/loginUser.service');
-const updateUser = require('../services/updateUser.service');
-const verifyUserWithOtp = require('../services/verifyUser.service');
-const changePwd = require('../services/changePassword.service');
+const run_service = require('../services/Auth/createUser.service');
+const login_service = require('../services/Auth/loginUser.service');
+const updateUser = require('../services/Auth/updateUser.service');
+const verifyUserWithOtp = require('../services/Auth/verifyUser.service');
+const changePwd = require('../services/Auth/changePassword.service');
+const resetPwd = require('../services/Auth/resetPassword.service');
 
 
 const CreateUser = async (req, res) => {
@@ -45,13 +46,7 @@ const verifyUser = async (req, res) => {
     } else {
         const data = await verifyUserWithOtp(user._id)
         // Encrypt
-        let encryptedOTP = CryptoJS.AES.encrypt(data.otp, 'bitlav').toString();
-
-        // // Decrypt
-        // let bytes  = CryptoJS.AES.decrypt(encryptedOTP, 'bitlav');
-        // var originalText = bytes.toString(CryptoJS.enc.Utf8);
-
-        
+        let encryptedOTP = CryptoJS.AES.encrypt(data.otp, process.env.ENCRYPT_KEY).toString();
 
         res.status(200).send({
             success: true,
@@ -106,6 +101,11 @@ const updateUserFields = async (req, res) => {
     }
 }
 
+const resetPassword = async (req, res) => {
+    const data = await resetPwd(req.body.email)
+    res.send(data)
+}
+
 
 module.exports = {
     CreateUser,
@@ -114,5 +114,6 @@ module.exports = {
     verifyUser,
     updateUserFields,
     changeUserPassword,
-    verifyOTPsent
+    verifyOTPsent,
+    resetPassword
 }

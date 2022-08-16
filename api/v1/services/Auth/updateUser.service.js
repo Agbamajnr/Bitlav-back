@@ -1,4 +1,4 @@
-const User = require('../models/user.model');
+const User = require('../../models/user.model');
 
 const updateUser = async (fname, lname,  id ) => {
     const user = await User.findById(id);

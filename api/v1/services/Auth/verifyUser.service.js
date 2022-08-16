@@ -1,9 +1,9 @@
 // models
-const User = require('../models/user.model');
-const otpCode = require('../models/otp.model');
+const User = require('../../models/user.model');
+const otpCode = require('../../models/otp.model');
 
 // helpers
-const generateCode = require('../helpers/generateCode');
+const generateCode = require('../../helpers/generateCode');
 
 async function verifyUserWithOtp(id) {
     const otp = String(generateCode(5));
