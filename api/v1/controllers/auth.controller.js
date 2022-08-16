@@ -46,7 +46,7 @@ const verifyUser = async (req, res) => {
     } else {
         const data = await verifyUserWithOtp(user._id)
         // Encrypt
-        let encryptedOTP = CryptoJS.AES.encrypt(data.otp, process.env.ENCRYPT_KEY).toString();
+        let encryptedOTP = CryptoJS.AES.encrypt(data.otp, 'bitlav').toString();
 
         res.status(200).send({
             success: true,
