@@ -16,7 +16,7 @@ const resetPwd = require('../services/Auth/resetPassword.service');
 
 
 const CreateUser = async (req, res) => {
-    const data = await run_service(currentDate, req.body.password, req.body.email, req.body.rfCode);
+    const data = await run_service(currentDate, req.body);
     if(data.success !== false) {
         const {password, ...info} = data;
         res.status(201).send(info);

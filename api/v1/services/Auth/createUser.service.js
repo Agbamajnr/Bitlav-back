@@ -9,10 +9,10 @@ const generateCode = length => {
 }
 
 
-const run_service = async (currentDate, password, email, rfCode) => {
+const run_service = async (currentDate, body) => {
 
     const salt = await bcrypt.genSalt(10);
-    const hashedPin = await bcrypt.hash(password.toString(), salt);
+    const hashedPin = await bcrypt.hash(body.password.toString(), salt);
     //tronWeb
     const TronWeb = require('tronweb')
     const HttpProvider = TronWeb.providers.HttpProvider;
@@ -40,11 +40,11 @@ const run_service = async (currentDate, password, email, rfCode) => {
             verified: false,
             username: null,
             password: hashedPin,
-            email: email,
-            fname: null,
-            lname: null,
+            email: body.email,
+            fname: body.firstname,
+            lname: body.firstname,
 
-            userRefferedBy: rfCode,
+            userRefferedBy: body.referralCode,
             referrals: [],
             referralEarnings: 0,
             referralCode: generateCode(5),
@@ -63,9 +63,9 @@ const run_service = async (currentDate, password, email, rfCode) => {
         try {
             const result = await user.save();
 
-            if (rfCode) {
+            if (data.referralCode) {
                 //handle new refferrals
-                const referringUser = await User.findOne({referralCode: rfCode})
+                const referringUser = await User.findOne({referralCode: data.referralCode})
                 const referral = new Referral({
                     userReffered: result.referralCode,
                     userReffering: referringUser.referralCode,
@@ -96,10 +96,10 @@ const run_service = async (currentDate, password, email, rfCode) => {
 
 
     //handle errors
-    let alreadyUserWithEmail = await User.findOne({email: email})
+    let alreadyUserWithEmail = await User.findOne({email: body.email})
 
     if (alreadyUserWithEmail !== null ) {
-        if (alreadyUserWithEmail.email === email) {
+        if (alreadyUserWithEmail.email === body.email) {
             return {
                 success: false,
                 message: 'An account with email already exist. Please try logging in again.',
