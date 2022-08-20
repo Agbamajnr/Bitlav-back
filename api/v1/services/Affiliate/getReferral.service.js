@@ -15,7 +15,7 @@ const getRf = async (id) => {
             userDetails: {
                 fname: user.fname,
                 lname: user.lname,
-                dataJoined: user.dataJoined,
+                dataJoined: user.dateJoined,
                 packagesCount: user.packages.length,
                 referralCount: user.referrals.length,
             },

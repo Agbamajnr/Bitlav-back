@@ -63,9 +63,9 @@ const run_service = async (currentDate, body) => {
         try {
             const result = await user.save();
 
-            if (data.referralCode) {
+            if (body.referralCode) {
                 //handle new refferrals
-                const referringUser = await User.findOne({referralCode: data.referralCode})
+                const referringUser = await User.findOne({referralCode: body.referralCode})
                 const referral = new Referral({
                     userReffered: result.referralCode,
                     userReffering: referringUser.referralCode,
@@ -76,6 +76,7 @@ const run_service = async (currentDate, body) => {
 
                 referringUser.referrals.push(refferalSaved._id);
                 const userSettingSaved = await referringUser.save();
+
             }
 
             return {
