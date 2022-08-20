@@ -7,7 +7,7 @@ const verify_token = require('../middlewares/authorizeToken.js');
 const { getReferral } = require('../controllers/affiliate.controller')
 
 
-router.get('/referral/', verify_token, getReferral)
+router.post('/referral/', verify_token, getReferral)
 
 
 
