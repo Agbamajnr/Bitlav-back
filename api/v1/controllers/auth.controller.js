@@ -22,6 +22,7 @@ const fullNode = new HttpProvider("https://api.trongrid.io");
 const solidityNode = new HttpProvider("https://api.trongrid.io");
 const eventServer = new HttpProvider("https://api.trongrid.io");
 const privateKey = process.env.ACC_PRIVATE_KEY;
+console.log(privateKey)
 const tronWeb = new TronWeb(fullNode,solidityNode,eventServer,privateKey);
 
 
