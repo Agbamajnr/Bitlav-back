@@ -71,6 +71,14 @@ const userSchema = new Schema(
             type: Number,
             required: true
         },
+        escrow: {
+            type: Number,
+            required: true
+        },
+        transactions: {
+            type: Array,
+            required: true,
+        },
         dateJoined: {
             type: String,
             required: true

@@ -1,5 +1,6 @@
 //models
 const User = require('../models/user.model');
+const Transaction = require('../models/transaction.model');
 
 const moment = require('moment');
 let currentDate = moment().format("MMM Do YYYY");
@@ -13,6 +14,15 @@ const updateUser = require('../services/Auth/updateUser.service');
 const verifyUserWithOtp = require('../services/Auth/verifyUser.service');
 const changePwd = require('../services/Auth/changePassword.service');
 const resetPwd = require('../services/Auth/resetPassword.service');
+
+// tron network
+const TronWeb = require('tronweb')
+const HttpProvider = TronWeb.providers.HttpProvider;
+const fullNode = new HttpProvider("https://api.trongrid.io");
+const solidityNode = new HttpProvider("https://api.trongrid.io");
+const eventServer = new HttpProvider("https://api.trongrid.io");
+const privateKey = process.env.ACC_PRIVATE_KEY;
+const tronWeb = new TronWeb(fullNode,solidityNode,eventServer,privateKey);
 
 
 const CreateUser = async (req, res) => {
@@ -28,9 +38,46 @@ const CreateUser = async (req, res) => {
 
 const getUser =  async (req, res) => {
     const user = await User.findById(req.user._id);
+
+    // const walletBalance = await tronWeb.trx.getBalance(user.blockchainAddress)
+    // const normalBalance = walletBalance * 0.000001;
+
+    async function triggerSmartContract(address) {
+        const trc20ContractAddress = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";//contract address
+    
+        try {
+            let contract = await tronWeb.contract().at(trc20ContractAddress);
+            //Use call to execute a pure or view smart contract method.
+            // These methods do not modify the blockchain, do not cost anything to execute and are also not broadcasted to the network.
+            let result = await contract.balanceOf(address).call();
+            return result.toString();
+        } catch(error) {
+            return error
+        }
+    }
+
+    const balance = await triggerSmartContract(user.blockchainAddress);
+
+    if (user.wallet < balance) {
+        const createTransaction = new Transaction({
+            userId: user._id,
+            amount: balance - user.wallet,
+            status: 'SUCCESS',
+            txnType: 'DEPOSIT',
+            mountId: null,
+            createdAt:  moment().format()
+        }) 
+    
+        const txnCreated = await createTransaction.save();
+        user.wallet = balance;
+        user.transactions.push(txnCreated._id);
+        const txnSaved = await user.save()
+    }
     const {password, ...info} = user.toJSON()
     res.status(200).send(info)
 }
+
+    
 
 
 const LoginUser = async (req, res) => {

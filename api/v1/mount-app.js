@@ -3,6 +3,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const AuthenticationRoute = require('./routes/auth.route.js')
 const AffiliateRoute = require('./routes/affiliate.route.js')
+const FinanceRoute = require('./routes/finance.route.js')
 
 const app = express();
 
@@ -33,4 +34,5 @@ module.exports = function mountApp(app) {
 
   app.use('/api/auth', AuthenticationRoute)
   app.use('/api/affiliate', AffiliateRoute)
+  app.use('/api/finance', FinanceRoute)
 };

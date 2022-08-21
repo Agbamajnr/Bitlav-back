@@ -14,13 +14,12 @@ const run_service = async (currentDate, body) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPin = await bcrypt.hash(body.password.toString(), salt);
     //tronWeb
-    const TronWeb = require('tronweb')
     const HttpProvider = TronWeb.providers.HttpProvider;
-    const fullNode = new HttpProvider("https://api.shasta.trongrid.io");
-    const solidityNode = new HttpProvider("https://api.shasta.trongrid.io");
-    const eventServer = new HttpProvider("https://api.shasta.trongrid.io");
-    const tronWeb = new TronWeb(fullNode,solidityNode,eventServer);
-
+    const fullNode = new HttpProvider("https://api.trongrid.io");
+    const solidityNode = new HttpProvider("https://api.trongrid.io");
+    const eventServer = new HttpProvider("https://api.trongrid.io");
+    const privateKey = process.env.ACC_PRIVATE_KEY;
+    const tronWeb = new TronWeb(fullNode,solidityNode,eventServer,privateKey);
     
     
     async function createUserAccount() {
@@ -54,6 +53,8 @@ const run_service = async (currentDate, body) => {
             ],
             currentPackage: 'Starter',
             wallet: 0,
+            escrow: 0,
+            transactions: [],
             privateKey: privateKey,
             blockchainAddress: address,
             dateJoined: currentDate
