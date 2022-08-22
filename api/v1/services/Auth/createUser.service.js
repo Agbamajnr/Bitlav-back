@@ -89,7 +89,7 @@ const run_service = async (currentDate, body) => {
         } catch (error) {
             return {
                 success: false,
-                error: result,
+                error: error,
                 message: 'Error while creating account',
             }
         }
