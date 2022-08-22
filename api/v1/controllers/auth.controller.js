@@ -41,42 +41,47 @@ const CreateUser = async (req, res) => {
 const getUser =  async (req, res) => {
     const user = await User.findById(req.user._id);
 
-    // const walletBalance = await tronWeb.trx.getBalance(user.blockchainAddress)
-    // const normalBalance = walletBalance * 0.000001;
+    if (user !== null) {
+        
 
-    async function triggerSmartContract(address) {
-        const trc20ContractAddress = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";//usdt contract address
-    
-        try {
-            let contract = await tronWeb.contract().at(trc20ContractAddress);
-            //Use call to execute a pure or view smart contract method.
-            // These methods do not modify the blockchain, do not cost anything to execute and are also not broadcasted to the network.
-            let result = await contract.balanceOf(address).call();
-            return result.toString();
-        } catch(error) {
-            return error
+        async function triggerSmartContract(address) {
+            const trc20ContractAddress = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";//usdt contract address
+        
+            try {
+                let contract = await tronWeb.contract().at(trc20ContractAddress);
+                //Use call to execute a pure or view smart contract method.
+                // These methods do not modify the blockchain, do not cost anything to execute and are also not broadcasted to the network.
+                let result = await contract.balanceOf(address).call();
+                return result.toString();
+            } catch(error) {
+                return error
+            }
         }
-    }
 
-    const balance = await triggerSmartContract(user.blockchainAddress);
+        const balance = await triggerSmartContract(user.blockchainAddress);
 
-    if (user.wallet < balance) {
-        const createTransaction = new Transaction({
-            userId: user._id,
-            amount: balance - user.wallet,
-            status: 'SUCCESS',
-            txnType: 'DEPOSIT',
-            mountId: null,
-            createdAt:  moment().format()
-        }) 
-    
-        const txnCreated = await createTransaction.save();
-        user.wallet = balance;
-        user.transactions.push(txnCreated._id);
-        const txnSaved = await user.save()
+        if (user.wallet < balance) {
+            const createTransaction = new Transaction({
+                userId: user._id,
+                amount: balance - user.wallet,
+                status: 'SUCCESS',
+                txnType: 'DEPOSIT',
+                mountId: null,
+                createdAt:  moment().format()
+            }) 
+        
+            const txnCreated = await createTransaction.save();
+            user.wallet = balance;
+            user.transactions.push(txnCreated._id);
+            const txnSaved = await user.save()
+        }
+        const {password, ...info} = user.toJSON()
+        res.status(200).send(info)
+    } else {
+        res.status(404).send({
+            message: 'User not found'
+        })
     }
-    const {password, ...info} = user.toJSON()
-    res.status(200).send(info)
 }
 
     
