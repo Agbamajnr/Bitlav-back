@@ -14,6 +14,7 @@ const run_service = async (currentDate, body) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPin = await bcrypt.hash(body.password.toString(), salt);
     //tronWeb
+    const TronWeb = require('tronweb')
     const HttpProvider = TronWeb.providers.HttpProvider;
     const fullNode = new HttpProvider("https://api.trongrid.io");
     const solidityNode = new HttpProvider("https://api.trongrid.io");

@@ -22,6 +22,10 @@ const txnSchema = new mongoose.Schema({
         type: String,
         required: false
     },
+    fee: {
+        type: Number,
+        required: false
+    },
     createdAt: Date,
 })
 

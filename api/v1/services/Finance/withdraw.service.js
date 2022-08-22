@@ -17,6 +17,7 @@ const withdraw = async (body, currentDate, id) => {
             status: 'PENDING',
             txnType: 'WITHDRAW',
             mountId: null,
+            fee: 0,
             createdAt: currentDate
         })  
         const txnRES = await txn.save();

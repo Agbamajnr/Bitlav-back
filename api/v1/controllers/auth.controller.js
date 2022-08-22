@@ -22,7 +22,8 @@ const fullNode = new HttpProvider("https://api.trongrid.io");
 const solidityNode = new HttpProvider("https://api.trongrid.io");
 const eventServer = new HttpProvider("https://api.trongrid.io");
 const privateKey = process.env.ACC_PRIVATE_KEY;
-console.log(privateKey)
+
+
 const tronWeb = new TronWeb(fullNode,solidityNode,eventServer,privateKey);
 
 
@@ -44,7 +45,7 @@ const getUser =  async (req, res) => {
     // const normalBalance = walletBalance * 0.000001;
 
     async function triggerSmartContract(address) {
-        const trc20ContractAddress = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";//contract address
+        const trc20ContractAddress = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";//usdt contract address
     
         try {
             let contract = await tronWeb.contract().at(trc20ContractAddress);
