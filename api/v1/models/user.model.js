@@ -75,6 +75,10 @@ const userSchema = new Schema(
             type: Number,
             required: true
         },
+        investmentBalance: {
+            type: Number,
+            required: true
+        },
         transactions: {
             type: Array,
             required: true,

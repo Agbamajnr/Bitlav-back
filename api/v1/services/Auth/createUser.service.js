@@ -55,6 +55,7 @@ const run_service = async (currentDate, body) => {
             currentPackage: 'Starter',
             wallet: 0,
             escrow: 0,
+            investmentBalance: 0,
             transactions: [],
             privateKey: privateKey,
             blockchainAddress: address,
