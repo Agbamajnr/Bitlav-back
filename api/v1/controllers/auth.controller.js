@@ -79,7 +79,8 @@ const getUser =  async (req, res) => {
         res.status(200).send(info)
     } else {
         res.status(404).send({
-            message: 'User not found'
+            message: 'User not found',
+            error: null
         })
     }
 }
