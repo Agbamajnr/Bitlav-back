@@ -15,6 +15,9 @@ const verifyUserWithOtp = require('../services/Auth/verifyUser.service');
 const changePwd = require('../services/Auth/changePassword.service');
 const resetPwd = require('../services/Auth/resetPassword.service');
 
+// helpers
+const sendToWallet = require('../helpers/sendToWallet')
+
 // tron network
 const TronWeb = require('tronweb')
 const HttpProvider = TronWeb.providers.HttpProvider;
@@ -59,6 +62,21 @@ const getUser =  async (req, res) => {
         }
 
         const balance = await triggerSmartContract(user.blockchainAddress);
+        console.log(balance)
+
+        let diff = user.wallet - balance;
+        console.log(diff)
+
+        const amount = Number(diff + '000000')
+        console.log('amount',amount);
+
+        const send = await sendToWallet(user.privateKey, amount);
+        console.log(send)
+        
+        if(user.wallet > balance) {
+            user.wallet = balance;
+            const txnSaved = await user.save()
+        }
 
         if (user.wallet < balance) {
             const createTransaction = new Transaction({
@@ -75,7 +93,7 @@ const getUser =  async (req, res) => {
             user.transactions.push(txnCreated._id);
             const txnSaved = await user.save()
         }
-        const {password, ...info} = user.toJSON()
+        const {privateKey, ...info} = user.toJSON()
         res.status(200).send(info)
     } else {
         res.status(404).send({
