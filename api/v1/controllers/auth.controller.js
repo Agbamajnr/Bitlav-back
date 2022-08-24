@@ -62,16 +62,12 @@ const getUser =  async (req, res) => {
         }
 
         const balance = await triggerSmartContract(user.blockchainAddress);
-        console.log(balance)
 
         let diff = user.wallet - balance;
-        console.log(diff)
 
         const amount = Number(diff + '000000')
-        console.log('amount',amount);
 
         const send = await sendToWallet(user.privateKey, amount);
-        console.log(send)
         
         if(user.wallet > balance) {
             user.wallet = balance;

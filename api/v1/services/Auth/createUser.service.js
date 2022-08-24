@@ -19,7 +19,7 @@ const run_service = async (currentDate, body) => {
     const fullNode = new HttpProvider("https://api.trongrid.io");
     const solidityNode = new HttpProvider("https://api.trongrid.io");
     const eventServer = new HttpProvider("https://api.trongrid.io");
-    const privateKey = '6812633245de403410cdaa7b5324853d9a9e99cc496715a06a528dd64f68ce31';
+    const privateKey = process.ACC_PRIVATE_KEY;
     const tronWeb = new TronWeb(fullNode,solidityNode,eventServer,privateKey);
 
     const ACCOUNT = "TXdFBQYvy6EsWnUp98KaTp4ajM4QyiZccu";
@@ -87,24 +87,29 @@ const run_service = async (currentDate, body) => {
 
             try {
                 const tradeObj = await tronWeb.transactionBuilder.sendTrx(result.blockchainAddress, 3000000, ACCOUNT);
-                const signedtxn = await tronWeb.trx.sign(tradeObj, '6812633245de403410cdaa7b5324853d9a9e99cc496715a06a528dd64f68ce31');
+                const signedtxn = await tronWeb.trx.sign(tradeObj, process.env.ACC_PRIVATE_KEY);
 
                 // Broadcast
                 const receipt = await tronWeb.trx.sendRawTransaction(
                     signedtxn
                 )
             } catch (error) {
-                return {
-                    success: false,
-                    error: error
-                }
+                console.log(error);
             }
 
+            const tradeObj = await tronWeb.transactionBuilder.sendTrx(ACCOUNT, 3000000, result.blockchainAddress);
+            const signedtxn = await tronWeb.trx.sign(tradeObj, result.privateKey);
+
+            // Broadcast
+            const receipt = await tronWeb.trx.sendRawTransaction(
+                signedtxn
+            )
             return {
                 success: true,
                 error: null,
                 message: 'Account created successfully'
             }
+            
         } catch (error) {
             return {
                 success: false,
