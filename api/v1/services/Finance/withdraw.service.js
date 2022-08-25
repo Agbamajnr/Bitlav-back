@@ -2,8 +2,15 @@ const User = require('../../models/user.model');
 const Withdraw = require('../../models/withdraw.model');
 const Transaction = require('../../models/transaction.model');
 
+const moment = require('moment');
+let time = moment().format('LTS')
+let date = moment().format('L')
+let currentDate = moment().format('LLL')
 
-const withdraw = async (body, currentDate, id) => {
+console.log(time, date, currentDate)
+
+
+const withdraw = async (body, id) => {
     const user = await User.findById(id);
     if(user.wallet < body.amount) {
         return {
@@ -15,10 +22,13 @@ const withdraw = async (body, currentDate, id) => {
             userId: id,
             amount: body.amount,
             status: 'PENDING',
-            txnType: 'WITHDRAW',
+            txnType: 'WALLET WITHDRAW',
             mountId: null,
             fee: 0,
-            createdAt: currentDate
+            createdAt: currentDate,
+            time: time,
+            date: date
+
         })  
         const txnRES = await txn.save();
         const withdraw = new Withdraw({

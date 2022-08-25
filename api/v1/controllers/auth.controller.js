@@ -3,7 +3,9 @@ const User = require('../models/user.model');
 const Transaction = require('../models/transaction.model');
 
 const moment = require('moment');
-let currentDate = moment().format("MMM Do YYYY");
+let time = moment().format('LTS')
+let date = moment().format('L')
+let currentDate = moment().format('LLL')
 const CryptoJS = require("crypto-js");
 
 
@@ -42,7 +44,7 @@ const CreateUser = async (req, res) => {
 
 
 const getUser =  async (req, res) => {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user);
 
     if (user !== null) {
         
@@ -55,33 +57,36 @@ const getUser =  async (req, res) => {
                 //Use call to execute a pure or view smart contract method.
                 // These methods do not modify the blockchain, do not cost anything to execute and are also not broadcasted to the network.
                 let result = await contract.balanceOf(address).call();
-                return result.toString();
+                return tronWeb.fromSun(parseInt(result.toString()));
             } catch(error) {
                 return error
             }
         }
 
-        const balance = await triggerSmartContract(user.blockchainAddress);
+        const balData = await triggerSmartContract(user.blockchainAddress);
+        const balance = Number(balData);
 
         let diff = user.wallet - balance;
 
-        const amount = Number(diff + '000000')
+        const amount = tronWeb.toSun(diff)
 
         const send = await sendToWallet(user.privateKey, amount);
         
-        if(user.wallet > balance) {
-            user.wallet = balance;
-            const txnSaved = await user.save()
-        }
+        // if(user.wallet > balance) {
+        //     user.wallet = balance;
+        //     const txnSaved = await user.save()
+        // }
 
         if (user.wallet < balance) {
             const createTransaction = new Transaction({
                 userId: user._id,
                 amount: balance - user.wallet,
-                status: 'SUCCESS',
-                txnType: 'DEPOSIT',
+                status: 'COMPLETED',
+                txnType: 'WALLET DEPOSIT',
                 mountId: null,
-                createdAt:  moment().format()
+                createdAt: currentDate,
+                time: time,
+                date: date
             }) 
         
             const txnCreated = await createTransaction.save();
@@ -147,7 +152,7 @@ const verifyOTPsent = async (req, res) => {
 }
 
 const changeUserPassword = async (req, res) => {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user);
     if (!user) {
         return res.status(400).json({error: "User not found"})
     } else {
@@ -157,7 +162,7 @@ const changeUserPassword = async (req, res) => {
 }
 
 const updateUserFields = async (req, res) => {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user);
     if (!user) {
         return res.status(400).json({error: "User not found"})
     } else {

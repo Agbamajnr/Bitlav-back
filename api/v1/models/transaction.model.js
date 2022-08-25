@@ -7,7 +7,7 @@ const txnSchema = new mongoose.Schema({
         required: true
     },
     amount: {
-        type: String,
+        type: Number,
         required: false
     },
     status: {
@@ -27,6 +27,14 @@ const txnSchema = new mongoose.Schema({
         required: false
     },
     createdAt: Date,
+    time: {
+        type: String,
+        required: true
+    },
+    date: {
+        type: String,
+        required: true
+    }
 })
 
 module.exports = mongoose.model('Transaction', txnSchema)

@@ -1,25 +1,48 @@
 const User = require('../models/user.model');
-const Withdraw = require('../models/withdraw.model');
 const Transaction = require('../models/transaction.model');
 
-const moment = require('moment');
-let currentDate = moment().format()
 
 const withdraw = require('../services/Finance/withdraw.service');
+const purchase = require('../services/Finance/purchasePackage.service');
 
 const withdrawFunds = async(req, res) => {
-    const user = await User.findById(req.user._id);
-    const info = await withdraw(req.body, currentDate, req.user._id)
-    res.send(info);
+    const user = await User.findById(req.user);
+    if(!user) {
+        res.status(404).send({
+            message: 'User not found',
+        })
+    } else {
+        const info = await withdraw(req.body, req.user)
+        res.send(info);
+    }
 }
 
 const getTransaction = async (req, res) => {
-    // const user = await User.findById(req.user._id);
-    const transaction = await Transaction.findById(req.body.id);
-    res.send(transaction)
+    const user = await User.findById(req.user);
+    if(!user) {
+        res.status(404).send({
+            message: 'User not found',
+        })
+    } else {
+        const transaction = await Transaction.findById(req.body.id);
+        res.send(transaction)
+    }  
+}
+
+const purchasePackage = async(req, res) => {
+    const user = await User.findById(req.user);
+    if(!user) {
+        res.status(404).send({
+            message: 'User not found',
+        })
+    } else {
+        const purchs = await purchase(user._id, req.body)
+        res.send(purchs)
+    }
 }
 
 module.exports = {
     withdrawFunds,
-    getTransaction
+    getTransaction,
+    purchasePackage
 }

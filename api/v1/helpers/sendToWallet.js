@@ -19,6 +19,10 @@ async function sendToWallet(userPK, amount) {
         const contractInstance = await tronWeb.contract().at(contractAddressHex);
         const decimals = await contractInstance.decimals().call();
         const response = await contractInstance.transfer(ACCOUNT, amount).send();
+
+        return {
+            message: 'Sent'
+        }
     } catch (e) {
         console.error(e);
         return null;
