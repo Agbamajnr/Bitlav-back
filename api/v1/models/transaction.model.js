@@ -26,7 +26,10 @@ const txnSchema = new mongoose.Schema({
         type: Number,
         required: false
     },
-    createdAt: Date,
+    createdAt: {
+        type: String,
+        required: true
+    },
     time: {
         type: String,
         required: true
