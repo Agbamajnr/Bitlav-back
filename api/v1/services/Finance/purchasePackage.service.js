@@ -55,6 +55,7 @@ const purchase = async (id, body) => {
     if (user.packages.includes(body.package + ' ' + 'Larva') === false ) {
         if (body.price <= balance) {
             const deduct = await sendToWallet(user.privateKey, tronWeb.toSun(body.price));
+            user.wallet -= body.price;
 
             let package = {
                 name: body.package + ' ' + 'Larva',
