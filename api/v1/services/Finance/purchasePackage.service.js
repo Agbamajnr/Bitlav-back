@@ -63,6 +63,7 @@ const purchase = async (id, body) => {
             }
 
             user.packages.push(package);
+            user.currentPackage = body.package + ' ' + 'Larva'
 
             const txn = new Transaction({
                 userId: user._id,
