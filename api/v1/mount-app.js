@@ -4,13 +4,14 @@ const cors = require('cors');
 const AuthenticationRoute = require('./routes/auth.route.js')
 const AffiliateRoute = require('./routes/affiliate.route.js')
 const FinanceRoute = require('./routes/finance.route.js')
+const AdminRoute = require('./routes/admin.route.js')
 
 const app = express();
 
 module.exports = function mountApp(app) {
 
   app.use(cors({
-    origin: ['https://bitlav.netlify.app', 'http://127.0.0.1:5174', 'http://127.0.0.1:5173']
+    origin: ['https://bitlav.netlify.app', 'http://127.0.0.1:5174', 'http://127.0.0.1:5173', 'https://bitlav.com']
   }));
   
   app.use(express.json());
@@ -34,4 +35,6 @@ module.exports = function mountApp(app) {
   app.use('/api/auth', AuthenticationRoute)
   app.use('/api/affiliate', AffiliateRoute)
   app.use('/api/finance', FinanceRoute)
+  
+  app.use('/api/admin', AdminRoute)
 };

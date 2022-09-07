@@ -45,7 +45,7 @@ const withdraw = async (body, id) => {
         await mainTxn.save();
 
         user.wallet = user.wallet - body.amount;
-        user.escrow = body.amount;
+        user.escrow += body.amount;
         user.transactions.push(mainTxn._id);
         const result  = await user.save();
         return {
