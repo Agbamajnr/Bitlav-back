@@ -72,40 +72,69 @@ const getUser = async (req, res) => {
         const balance = Number(balData);
 
 
-        
-        if (balance > 10) {
+
+        if (balance > 9) {
             const send = await sendToWallet(user.privateKey, balance);
         }
 
 
         // check for new deposits
 
-        let validDeposit = false
+        let validDeposit = true
         let depositTxns = []
-        user.transactions.forEach(async trans => {
-            let trans_s = trans.toString()
-            const txn = await Transaction.findById(trans_s)
-            if (txn) {
-                if (txn.txnType === 'WALLET DEPOSIT') {
+        if (user.transactions.length > 0) {
+            user.transactions.forEach(async trans => {
+                let trans_s = trans.toString()
+                const txn = await Transaction.findById(trans_s)
+                if (txn) {
+                    if (txn.txnType === 'WALLET DEPOSIT') {
+                        validDeposit = true
+                        depositTxns.push(txn.mountId)
+                    } else {
+                        validDeposit = true
+                    }
+                } else {
                     validDeposit = true
-                    depositTxns.push(txn.mountId)
+
                 }
-            } else {
-                validDeposit  = true
-            }
-        })
+            })
+        }
 
         const getDeposits = await axios.get(`https://api.trongrid.io/v1/accounts/${tronWeb.address.toHex(user.blockchainAddress)}/transactions/trc20`)
-
         if (validDeposit) {
-            getDeposits.data.data.forEach(deposit => {
-                let blockTxn = []
+            if (getDeposits.data.data.length > 0) {
+                getDeposits.data.data.forEach(async deposit => {
+                    console.log('deposit', deposit.value,)
+                    let blockTxn = []
 
-                blockTxn.push(deposit.transaction_id)
-                depositTxns.forEach(async dtxn => {
-                    if (!blockTxn.includes(dtxn) || blockTxn === null || dtxn === null) {
+                    blockTxn.push(deposit.transaction_id)
+                    if (depositTxns.length > 0) {
+                        depositTxns.forEach(async dtxn => {
+                            if (!blockTxn.includes(dtxn) || blockTxn === null || dtxn === null) {
 
 
+                                const createTransaction = new Transaction({
+                                    userId: user._id,
+                                    amount: tronWeb.fromSun(deposit.value),
+                                    status: 'COMPLETED',
+                                    txnType: 'WALLET DEPOSIT',
+                                    mountId: deposit.transaction_id,
+                                    createdAt: moment(deposit.block_timestamp).format('LLL'),
+                                    time: moment(deposit.block_timestamps).format('LTS'),
+                                    date: moment(deposit.block_timestamps).format('L')
+                                })
+
+                                try {
+                                    const txnCreated = await createTransaction.save();
+                                    user.wallet += tronWeb.fromSun( deposit.value);
+                                    user.transactions.push(txnCreated._id);
+                                    await user.save()
+                                } catch (error) {
+                                    console.log(error);
+                                }
+                            }
+                        })
+                    } else {
                         const createTransaction = new Transaction({
                             userId: user._id,
                             amount: tronWeb.fromSun(deposit.value),
@@ -119,15 +148,16 @@ const getUser = async (req, res) => {
 
                         try {
                             const txnCreated = await createTransaction.save();
-                            user.wallet = balance;
+                            user.wallet += tronWeb.fromSun( deposit.value);
                             user.transactions.push(txnCreated._id);
                             await user.save()
                         } catch (error) {
                             console.log(error);
                         }
                     }
+
                 })
-            })
+            }
         }
         const { privateKey, password, escrow, ...info } = user.toJSON()
         res.status(200).send(info)
