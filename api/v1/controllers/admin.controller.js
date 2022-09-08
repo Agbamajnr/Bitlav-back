@@ -66,7 +66,7 @@ const getWithdrawal = async (req, res) => {
 
         res.send({
             name: user.fname + ' ' + user.lname,
-            date: txn.createdAt,
+            date: txn.date,
             amount: Doc.amount,
             address: Doc.address,
             others: Doc
