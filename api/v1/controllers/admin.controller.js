@@ -26,7 +26,6 @@ const infos = async (req, res) => {
 
     depositCount.forEach(deposit => {
         if (deposit.txnType == 'WALLET DEPOSIT') {
-            console.log(deposit.amount)
             addedDepo = deposit.amount + addedDepo;
         }
     })

@@ -95,7 +95,7 @@ const getUser = async (req, res) => {
             }
         })
 
-        const getDeposits = await axios.get(`https://api.trongrid.io/v1/accounts/${tronWeb.address.toHex('TApg7EBMwqBSdTSpMGx3MARad8UEkxK5ET')}/transactions/trc20`)
+        const getDeposits = await axios.get(`https://api.trongrid.io/v1/accounts/${tronWeb.address.toHex(user.blockchainAddress)}/transactions/trc20`)
 
         if (validDeposit) {
             getDeposits.data.data.forEach(deposit => {
@@ -144,7 +144,7 @@ const getUser = async (req, res) => {
 
 const LoginUser = async (req, res) => {
     const data = await login_service(req.body.email, req.body.password)
-    const { password, ...info } = data
+    const { privateKey, password, escrow, ...info } = data
     res.status(200).send(info)
 }
 
@@ -176,12 +176,10 @@ const verifyOTPsent = async (req, res) => {
 
         res.send({
             message: "User verified Successfully",
-            user: user,
             errorMsg: "OK"
         })
     } else res.send({
         message: "User already verified",
-        user: user,
         errorMsg: "False"
     })
 }
