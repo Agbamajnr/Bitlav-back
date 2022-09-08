@@ -21,7 +21,10 @@ const withdrawSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    createdAt: Date,
+    createdAt: {
+        type: String,
+        required: true
+    },
 })
 
 module.exports = mongoose.model('Withdraw', withdrawSchema)

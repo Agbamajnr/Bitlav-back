@@ -62,11 +62,10 @@ const getWithdrawal = async (req, res) => {
     } else {
         const Doc = await Withdraw.findById(req.body.id);
         const user = await User.findById(Doc.userId);
-        const txn = await Transaction.findById(Doc.txId)
 
         res.send({
             name: user.fname + ' ' + user.lname,
-            date: txn.date,
+            date: Doc.createdAt,
             amount: Doc.amount,
             address: Doc.address,
             others: Doc
