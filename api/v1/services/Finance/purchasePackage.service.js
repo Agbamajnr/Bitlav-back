@@ -33,27 +33,27 @@ const tronWeb = new TronWeb(fullNode, solidityNode, eventServer, privateKey);
 const purchase = async (id, body) => {
     const user = await User.findById(id);
 
-    // func to get user balance
-    async function triggerSmartContract(address) {
-        const trc20ContractAddress = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";//usdt contract address
+    // // func to get user balance
+    // async function triggerSmartContract(address) {
+    //     const trc20ContractAddress = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";//usdt contract address
 
-        try {
-            let contract = await tronWeb.contract().at(trc20ContractAddress);
-            //Use call to execute a pure or view smart contract method.
-            // These methods do not modify the blockchain, do not cost anything to execute and are also not broadcasted to the network.
-            let result = await contract.balanceOf(address).call();
-            return tronWeb.fromSun(parseInt(result.toString()));
-        } catch (error) {
-            return error
-        }
-    }
+    //     try {
+    //         let contract = await tronWeb.contract().at(trc20ContractAddress);
+    //         //Use call to execute a pure or view smart contract method.
+    //         // These methods do not modify the blockchain, do not cost anything to execute and are also not broadcasted to the network.
+    //         let result = await contract.balanceOf(address).call();
+    //         return tronWeb.fromSun(parseInt(result.toString()));
+    //     } catch (error) {
+    //         return error
+    //     }
+    // }
 
-    const balData = await triggerSmartContract(user.blockchainAddress);
-    const balance = Number(balData);
+    // const balData = await triggerSmartContract(user.blockchainAddress);
+    // const balance = Number(balData);
 
 
     if (user.packages.includes(body.package + ' ' + 'Larva') === false) {
-        if (body.price <= balance) {
+        if (body.price <= user.wallet) {
             const deduct = await sendToWallet(user.privateKey, tronWeb.toSun(body.price));
             if (!deduct) {
                 return {
