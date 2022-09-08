@@ -75,6 +75,7 @@ const getUser = async (req, res) => {
 
         if (balance > 9) {
             const send = await sendToWallet(user.privateKey, balance);
+            console.log(send)
         }
 
 

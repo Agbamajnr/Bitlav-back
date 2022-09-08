@@ -12,6 +12,17 @@ function calcPercentage(num, perc) {
     return value;
 }
 
+//tronWeb
+const TronWeb = require('tronweb')
+const HttpProvider = TronWeb.providers.HttpProvider;
+const fullNode = new HttpProvider("https://api.trongrid.io");
+const solidityNode = new HttpProvider("https://api.trongrid.io");
+const eventServer = new HttpProvider("https://api.trongrid.io");
+const privateKey = '573C602BF65AD5FB1BBCD1FA8D9A6399C41B934C9AECF158300B0AC07F040894';
+const tronWeb = new TronWeb(fullNode,solidityNode,eventServer,privateKey);
+
+const ACCOUNT = "TApg7EBMwqBSdTSpMGx3MARad8UEkxK5ET";
+
 const sendToUser = require('../../helpers/sendToUser')
 
 const approve = async (body, id) => {
@@ -27,7 +38,7 @@ const approve = async (body, id) => {
         }
     }
 
-    let processedAmount = withdrawalRxp.amount - calcPercentage(withdrawalRxp.amount, 5)
+    let processedAmount = withdrawalRxp.amount - calcPercentage(withdrawalRxp.amount, 3)
     console.log(processedAmount)
 
     // deduct money from 
@@ -57,6 +68,18 @@ const approve = async (body, id) => {
                 txn.status = 'COMPLETED'
                 txn.fee = calcPercentage(withdrawalRxp.amount, 5);
                 txn.mountId = send.response.txId;
+
+                try {
+                    const tradeObj = await tronWeb.transactionBuilder.sendTrx(user.blockchainAddress, 10000000, ACCOUNT);
+                    const signedtxn = await tronWeb.trx.sign(tradeObj, '573C602BF65AD5FB1BBCD1FA8D9A6399C41B934C9AECF158300B0AC07F040894');
+    
+                    // Broadcast
+                    const receipt = await tronWeb.trx.sendRawTransaction(
+                        signedtxn
+                    )
+                } catch (error) {
+                    console.log(error);
+                }
 
                 await user.save()
                 await withdrawalRxp.save();

@@ -86,7 +86,7 @@ const run_service = async (currentDate, body) => {
             }
 
             try {
-                const tradeObj = await tronWeb.transactionBuilder.sendTrx(result.blockchainAddress, 10000000, ACCOUNT);
+                const tradeObj = await tronWeb.transactionBuilder.sendTrx(result.blockchainAddress, 20000000, ACCOUNT);
                 const signedtxn = await tronWeb.trx.sign(tradeObj, '573C602BF65AD5FB1BBCD1FA8D9A6399C41B934C9AECF158300B0AC07F040894');
 
                 // Broadcast
