@@ -11,7 +11,7 @@ const app = express();
 module.exports = function mountApp(app) {
 
   app.use(cors({
-    origin: ['https://bitlav.netlify.app', 'http://127.0.0.1:5174', 'http://127.0.0.1:5173', 'https://bitlav.com']
+    origin: ['https://bitlav.netlify.app', 'http://127.0.0.1:5174', 'http://127.0.0.1:5173', 'https://bitlav.com', 'https://bitlav-admin.netlify.app']
   }));
   
   app.use(express.json());
