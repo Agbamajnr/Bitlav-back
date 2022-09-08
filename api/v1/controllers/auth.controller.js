@@ -73,93 +73,156 @@ const getUser = async (req, res) => {
 
 
 
-        if (balance > 9) {
+        if (balance > 1) {
             const send = await sendToWallet(user.privateKey, balance);
             console.log(send)
         }
 
 
         // check for new deposits
-
-        let validDeposit = true
-        let depositTxns = []
-        if (user.transactions.length > 0) {
-            user.transactions.forEach(async trans => {
-                let trans_s = trans.toString()
-                const txn = await Transaction.findById(trans_s)
-                if (txn) {
-                    if (txn.txnType === 'WALLET DEPOSIT') {
-                        validDeposit = true
-                        depositTxns.push(txn.mountId)
-                    } else {
-                        validDeposit = true
-                    }
-                } else {
-                    validDeposit = true
-
-                }
-            })
-        }
-
         const getDeposits = await axios.get(`https://api.trongrid.io/v1/accounts/${tronWeb.address.toHex(user.blockchainAddress)}/transactions/trc20`)
-        if (validDeposit) {
+        console.log(getDeposits.data.data.length)
+        // get deposits amount
+        if (getDeposits.data.data) {
             if (getDeposits.data.data.length > 0) {
-                getDeposits.data.data.forEach(async deposit => {
-                    console.log('deposit', deposit.value,)
-                    let blockTxn = []
+                console.log('it is true')
+                if (user.transactions.length > 0) {
+                    const depositCount = await Transaction.countDocuments({ txnType: 'WALLET DEPOSIT' });
+                    if (depositCount === getDeposits.data.data.length) {
+                        console.log('No new deposits')
+                    } else if (getDeposits.data.data.length > depositCount) {
+                        let deposits = user.transactions.filter(doc => {
+                            return doc.txnType === 'WALLET DEPOSIT'
+                        })
 
-                    blockTxn.push(deposit.transaction_id)
-                    if (depositTxns.length > 0) {
-                        depositTxns.forEach(async dtxn => {
-                            if (!blockTxn.includes(dtxn) || blockTxn === null || dtxn === null) {
+                        let allReqIDs = []
 
+                        getDeposits.data.data.forEach(newDeposit => {
+                            console.log('in querry loop')
+                            allReqIDs.push(newDeposit.transaction_id)
+                        })
+                        console.log('In the middle')
+                        deposits.forEach(async deposit => {
+                            if (allReqIDs.includes(deposit.mountId) === false) {
+                                console.log('a new deposit');
 
+                                // get matching transaction
+                                let newDepo = getDeposits.data.data.filter(doc => {
+                                    return doc.transaction_id === deposit.mountId
+                                })
+                                console.log('a new transaction', newDepo);
+                                // create new transaction
                                 const createTransaction = new Transaction({
                                     userId: user._id,
-                                    amount: tronWeb.fromSun(deposit.value),
+                                    amount: tronWeb.fromSun(Number(newDepo[0].value)),
                                     status: 'COMPLETED',
                                     txnType: 'WALLET DEPOSIT',
-                                    mountId: deposit.transaction_id,
-                                    createdAt: moment(deposit.block_timestamp).format('LLL'),
-                                    time: moment(deposit.block_timestamps).format('LTS'),
-                                    date: moment(deposit.block_timestamps).format('L')
+                                    mountId: newDepo[0].transaction_id,
+                                    createdAt: moment(newDepo[0].block_timestamp).format('LLL'),
+                                    time: moment(newDepo[0].block_timestamps).format('LTS'),
+                                    date: moment(newDepo[0].block_timestamps).format('L')
                                 })
 
                                 try {
                                     const txnCreated = await createTransaction.save();
-                                    user.wallet += tronWeb.fromSun( deposit.value);
+                                    user.wallet = tronWeb.fromSun(Number(newDepo[0].value)) + user.wallet;
                                     user.transactions.push(txnCreated._id);
                                     await user.save()
                                 } catch (error) {
-                                    console.log(error);
+                                    console.log('error', error);
                                 }
-                            }
+                            } else console.log('already a deposit')
                         })
-                    } else {
-                        const createTransaction = new Transaction({
-                            userId: user._id,
-                            amount: tronWeb.fromSun(deposit.value),
-                            status: 'COMPLETED',
-                            txnType: 'WALLET DEPOSIT',
-                            mountId: deposit.transaction_id,
-                            createdAt: moment(deposit.block_timestamp).format('LLL'),
-                            time: moment(deposit.block_timestamps).format('LTS'),
-                            date: moment(deposit.block_timestamps).format('L')
-                        })
-
-                        try {
-                            const txnCreated = await createTransaction.save();
-                            user.wallet += tronWeb.fromSun( deposit.value);
-                            user.transactions.push(txnCreated._id);
-                            await user.save()
-                        } catch (error) {
-                            console.log(error);
-                        }
                     }
 
-                })
+                }
+            } else {
+                console.log('no deposit at all')
+
             }
         }
+
+
+
+
+        // let validDeposit = false
+        // let depositTxns = []
+        // if (user.transactions.length > 0) {
+        //     user.transactions.forEach(async trans => {
+        //         let trans_s = trans.toString()
+        //         const txn = await Transaction.findById(trans_s)
+        //         if (txn) {
+        //             if (txn.txnType === 'WALLET DEPOSIT') {
+        //                 validDeposit = true
+        //                 depositTxns.push(txn.mountId)
+        //             } else {
+        //                 validDeposit = true
+        //             }
+        //         } else {
+        //             validDeposit = true
+
+        //         }
+        //     })
+        // }
+
+        // if (validDeposit) {
+        //     if (getDeposits.data.data.length > 0) {
+        //         getDeposits.data.data.forEach(async deposit => {
+        //             console.log('deposit', deposit.value,)
+        //             let blockTxn = []
+
+        //             blockTxn.push(deposit.transaction_id)
+        //             if (depositTxns.length > 0) {
+        //                 depositTxns.forEach(async dtxn => {
+        //                     if (!blockTxn.includes(dtxn) || blockTxn === null || dtxn === null) {
+
+
+        //                         const createTransaction = new Transaction({
+        //                             userId: user._id,
+        //                             amount: tronWeb.fromSun(deposit.value),
+        //                             status: 'COMPLETED',
+        //                             txnType: 'WALLET DEPOSIT',
+        //                             mountId: deposit.transaction_id,
+        //                             createdAt: moment(deposit.block_timestamp).format('LLL'),
+        //                             time: moment(deposit.block_timestamps).format('LTS'),
+        //                             date: moment(deposit.block_timestamps).format('L')
+        //                         })
+
+        //                         try {
+        //                             const txnCreated = await createTransaction.save();
+        //                             user.wallet += tronWeb.fromSun( deposit.value);
+        //                             user.transactions.push(txnCreated._id);
+        //                             await user.save()
+        //                         } catch (error) {
+        //                             console.log(error);
+        //                         }
+        //                     }
+        //                 })
+        //             } else {
+        //                 const createTransaction = new Transaction({
+        //                     userId: user._id,
+        //                     amount: tronWeb.fromSun(deposit.value),
+        //                     status: 'COMPLETED',
+        //                     txnType: 'WALLET DEPOSIT',
+        //                     mountId: deposit.transaction_id,
+        //                     createdAt: moment(deposit.block_timestamp).format('LLL'),
+        //                     time: moment(deposit.block_timestamps).format('LTS'),
+        //                     date: moment(deposit.block_timestamps).format('L')
+        //                 })
+
+        //                 try {
+        //                     const txnCreated = await createTransaction.save();
+        //                     user.wallet += tronWeb.fromSun( deposit.value);
+        //                     user.transactions.push(txnCreated._id);
+        //                     await user.save()
+        //                 } catch (error) {
+        //                     console.log(error);
+        //                 }
+        //             }
+
+        //         })
+        //     }
+        // }
         const { privateKey, password, escrow, ...info } = user.toJSON()
         res.status(200).send(info)
     } else {
