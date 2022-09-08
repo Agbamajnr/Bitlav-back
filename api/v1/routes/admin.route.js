@@ -1,12 +1,13 @@
 const router = require('express').Router();
 
 // controllers
-const { approveWithdrawals, infos, getWithdrawals } = require('../controllers/admin.controller')
+const { approveWithdrawals, infos, getWithdrawals, getWithdrawal } = require('../controllers/admin.controller')
 
 
 router.post('/approve/withdrawal', approveWithdrawals)
 router.get('/info', infos)
-router.post('/withdrawals/fetch', getWithdrawals)
+router.get('/withdrawals/fetch', getWithdrawals)
+router.post('/withdrawal/fetch', getWithdrawal)
 
 
 
