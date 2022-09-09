@@ -55,6 +55,8 @@ const run_service = async (currentDate, body) => {
                 {
                     name: 'Starter',
                     createdAt: currentDate,
+                    dailyReturns: 0,
+                    amountInvested: 0,
                     amountEarned: 0
                 }
             ],
