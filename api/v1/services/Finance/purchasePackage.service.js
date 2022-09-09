@@ -32,9 +32,13 @@ const tronWeb = new TronWeb(fullNode, solidityNode, eventServer, privateKey);
 
 const purchase = async (id, body) => {
     const user = await User.findById(id);
+    
+    let matchingPackage = user.packages.filter(package => {
+        return package.name === body.package;
+    }) 
+    console.log('matching', matchingPackage)
 
-
-    if (user.packages.includes(body.package + ' ' + 'Larva') === false) {
+    if (matchingPackage.length === 0) {
         if (body.price <= user.wallet) {
 
             user.wallet = user.wallet - body.price;
