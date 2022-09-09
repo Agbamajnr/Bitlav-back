@@ -42,6 +42,7 @@ const purchase = async (id, body) => {
             let package = {
                 name: body.package + ' ' + 'Larva',
                 createdAt: currentDate,
+                amountInvested: body.amount,
                 amountEarned: 0
             }
 
