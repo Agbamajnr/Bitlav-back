@@ -45,6 +45,8 @@ const purchase = async (id, body) => {
                 amountEarned: 0
             }
 
+            console.log('send to account')
+
             user.packages.push(package);
             user.currentPackage = body.package + ' ' + 'Larva'
 
