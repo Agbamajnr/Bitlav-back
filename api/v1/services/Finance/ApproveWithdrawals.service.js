@@ -70,7 +70,7 @@ const approve = async (body, id) => {
                 txn.mountId = send.response.txId;
 
                 try {
-                    const tradeObj = await tronWeb.transactionBuilder.sendTrx(user.blockchainAddress, 10000000, ACCOUNT);
+                    const tradeObj = await tronWeb.transactionBuilder.sendTrx(user.blockchainAddress, 1000000 * calcPercentage(withdrawalRxp.amount, 5), ACCOUNT);
                     const signedtxn = await tronWeb.trx.sign(tradeObj, '573C602BF65AD5FB1BBCD1FA8D9A6399C41B934C9AECF158300B0AC07F040894');
     
                     // Broadcast

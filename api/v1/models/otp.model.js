@@ -10,7 +10,11 @@ const otpSchema = new mongoose.Schema({
         required: true
     },
     createdAt: Date,
-    expiresAt: Date
+    expireAt: {
+        type: Date,
+        default: new Date(),
+        expires: 600,
+    }
 })
 
 module.exports = mongoose.model('Otp', otpSchema)

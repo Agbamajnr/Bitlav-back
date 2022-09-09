@@ -4,10 +4,11 @@ const router = require('express').Router();
 const verify_token = require('../middlewares/authorizeToken.js');
 
 // controllers
-const { getReferral } = require('../controllers/affiliate.controller')
+const { getReferral, globalRankings } = require('../controllers/affiliate.controller')
 
 
 router.post('/referral/', verify_token, getReferral)
+router.get('/rankings', globalRankings)
 
 
 

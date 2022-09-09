@@ -52,7 +52,11 @@ const run_service = async (currentDate, body) => {
             referralCode: generateCode(5),
 
             packages: [
-                'Starter'
+                {
+                    name: 'Starter',
+                    createdAt: currentDate,
+                    amountEarned: 0
+                }
             ],
             currentPackage: 'Starter',
             wallet: 0,
