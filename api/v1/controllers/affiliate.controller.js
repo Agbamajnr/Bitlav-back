@@ -32,6 +32,7 @@ const globalRankings = async(req, res) => {
             joiningDate: rank.dateJoined,
             packagesCount: rank.packages.length,
             amountEarned: rank.referralEarnings,
+            referralCount: rank.referrals.length,
             teamEarnings: teamEarnings
         }
         sanitizedRankings.push(obj)
