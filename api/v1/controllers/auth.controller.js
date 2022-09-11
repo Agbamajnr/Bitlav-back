@@ -111,11 +111,11 @@ const getUser = async (req, res) => {
                                 let newDepo = getDeposits.data.data.filter(doc => {
                                     return doc.transaction_id === deposit.mountId
                                 })
-                                console.log('a new transaction', newDepo);
+                                console.log('a new transaction', newDepo, Number(newDepo[0].value));
                                 // create new transaction
                                 const createTransaction = new Transaction({
                                     userId: user._id,
-                                    amount: tronWeb.fromSun(Number(newDepo[0].value)),
+                                    amount: tronWeb.fromSun(newDepo[0].value),
                                     status: 'COMPLETED',
                                     txnType: 'WALLET DEPOSIT',
                                     mountId: newDepo[0].transaction_id,
@@ -140,7 +140,7 @@ const getUser = async (req, res) => {
                     // create new transaction
                     const createTransaction = new Transaction({
                         userId: user._id,
-                        amount: tronWeb.fromSun(Number(getDeposits.data.data.value)),
+                        amount: tronWeb.fromSun(getDeposits.data.data.value),
                         status: 'COMPLETED',
                         txnType: 'WALLET DEPOSIT',
                         mountId: getDeposits.data.data.transaction_id,
