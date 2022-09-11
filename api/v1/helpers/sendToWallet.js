@@ -4,15 +4,19 @@ const HttpProvider = TronWeb.providers.HttpProvider;
 const fullNode = new HttpProvider("https://api.trongrid.io");
 const solidityNode = new HttpProvider("https://api.trongrid.io");
 const eventServer = new HttpProvider("https://api.trongrid.io");
-const privateKey = '573C602BF65AD5FB1BBCD1FA8D9A6399C41B934C9AECF158300B0AC07F040894';
 
-
-const tronWeb = new TronWeb(fullNode,solidityNode,eventServer,privateKey);
 
 const CONTRACT = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"; // USDT
 const ACCOUNT = "TApg7EBMwqBSdTSpMGx3MARad8UEkxK5ET";
 
 async function sendToWallet(userPK, amount) {
+    console.log(userPK, amount);
+    const privateKey = userPK;
+
+
+    const tronWeb = new TronWeb(fullNode,solidityNode,eventServer,privateKey);
+    
+    
     try {
         const ownerAddress = tronWeb.address.fromPrivateKey(userPK);
         const contractAddressHex = tronWeb.address.toHex(CONTRACT);
@@ -21,6 +25,7 @@ async function sendToWallet(userPK, amount) {
         const response = await contractInstance.transfer(ACCOUNT, amount).send();
 
         return {
+            response: response,
             message: 'Sent'
         }
     } catch (e) {
