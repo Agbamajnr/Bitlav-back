@@ -119,6 +119,7 @@ app.ws('/deposit/:id', async function (ws, req) {
                                 let newTxn = await Transaction.findById(txn);
                                 transactions.push(newTxn);
                             }
+
                             const deposits = transactions.filter(doc => {
                                 return doc.txnType === 'WALLET DEPOSIT'
                             })
@@ -132,7 +133,6 @@ app.ws('/deposit/:id', async function (ws, req) {
                                 allReqIDs.push(newDeposit.transaction_id)
                             })
 
-                            console.log(deposits, transactions)
 
                             deposits.forEach(async deposit => {
 
@@ -143,7 +143,7 @@ app.ws('/deposit/:id', async function (ws, req) {
                                         return doc.transaction_id !== deposit.mountId
                                     })
 
-                                    console.log(newDepo, deposit)
+                                    console.log(newDepo)
 
                                     const send = await sendToWallet(user.privateKey, tronWeb.toSun(balance));
 
