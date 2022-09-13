@@ -30,6 +30,10 @@ const userSchema = new Schema(
             type: String,
             required: false
         },
+        userImage: {
+            type: String,
+            required: true
+        },
         // affiliate data
         userRefferedBy: {
             type: String,

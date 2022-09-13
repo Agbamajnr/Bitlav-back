@@ -4,7 +4,7 @@ const router = require('express').Router();
 const verify_token = require('../middlewares/authorizeToken.js');
 
 // controllers
-const { CreateUser, getUser, LoginUser, verifyUser, updateUserFields, changeUserPassword, verifyOTPsent, resetPassword } = require('../controllers/auth.controller')
+const { CreateUser, getUser, LoginUser, verifyUser, updateUserFields, changeUserPassword, verifyOTPsent, resetPassword, changePicture } = require('../controllers/auth.controller')
 
 
 router.get('/user', verify_token, getUser)
@@ -18,5 +18,6 @@ router.put('/user/update', verify_token, updateUserFields)
 router.patch('/user/update/password', verify_token, changeUserPassword)
 router.patch('/user/password/reset', resetPassword)
 
+router.post('/user/change-picture', verify_token, changePicture)
 
 module.exports = router

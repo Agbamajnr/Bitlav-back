@@ -45,6 +45,7 @@ const run_service = async (currentDate, body) => {
             email: body.email,
             fname: body.firstname,
             lname: body.firstname,
+            userImage: null,
 
             userRefferedBy: body.referralCode,
             referrals: [],

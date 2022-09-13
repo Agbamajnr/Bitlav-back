@@ -18,6 +18,7 @@ const updateUser = require('../services/Auth/updateUser.service');
 const verifyUserWithOtp = require('../services/Auth/verifyUser.service');
 const changePwd = require('../services/Auth/changePassword.service');
 const resetPwd = require('../services/Auth/resetPassword.service');
+const profileImg = require('../services/Auth/profileImg.service');
 
 
 
@@ -258,6 +259,19 @@ const resetPassword = async (req, res) => {
     res.send(data)
 }
 
+const changePicture = async (req, res) => {
+    const user = await User.findById(req.user);
+    if (!user) {
+        return res.status(400).json({ error: "User not found" })
+    } else {
+        const data = await profileImg(req, user._id)
+        res.send({
+            err: null,
+            data
+        });
+    }
+}
+
 
 module.exports = {
     CreateUser,
@@ -267,5 +281,6 @@ module.exports = {
     updateUserFields,
     changeUserPassword,
     verifyOTPsent,
-    resetPassword
+    resetPassword,
+    changePicture,
 }
