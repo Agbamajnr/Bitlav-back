@@ -93,6 +93,10 @@ const getUser = async (req, res) => {
                             transactions.push(newTxn);
                         })
 
+                        setTimeout(() => {
+                            console.log('On transition')
+                        }, 1000);
+
                         let deposits = transactions.filter(doc => {
                             return doc.txnType !== 'WALLET DEPOSIT'
                         })
