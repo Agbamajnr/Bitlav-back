@@ -113,7 +113,6 @@ app.ws('/deposit/:id', async function (ws, req) {
                     if (user.transactions.length > 0) {
                         const depositCount = await Transaction.countDocuments({ txnType: 'WALLET DEPOSIT' });
                         if (allDeposits.length > depositCount) {
-
                             let transactions = [];
 
                             for (let txn of user.transactions) {
@@ -132,10 +131,6 @@ app.ws('/deposit/:id', async function (ws, req) {
                             allDeposits.forEach(newDeposit => {
                                 allReqIDs.push(newDeposit.transaction_id)
                             })
-
-                            setTimeout(() => {
-                                console.log('2')
-                            }, 700);
 
                             console.log(deposits, transactions)
 
