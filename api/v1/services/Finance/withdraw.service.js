@@ -23,7 +23,6 @@ const withdraw = async (body, id) => {
             amount: body.amount,
             status: 'PENDING',
             txnType: 'WALLET WITHDRAW',
-            mountId: null,
             fee: 0,
             createdAt: currentDate,
             time: time,

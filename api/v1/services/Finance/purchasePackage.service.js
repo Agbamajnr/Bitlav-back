@@ -60,7 +60,6 @@ const purchase = async (id, body) => {
                 amount: body.price,
                 status: 'COMPLETED',
                 txnType: 'PURCHASE PACKAGE',
-                mountId: null,
                 fee: 0,
                 createdAt: currentDate,
                 time: time,
