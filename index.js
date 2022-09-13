@@ -137,6 +137,8 @@ app.ws('/deposit/:id', async function (ws, req) {
                             setTimeout(() => {
                                 console.log('2')
                             }, 400);
+
+                            console.log(deposits, allDeposits, transactions)
     
                             deposits.forEach(async deposit => {
     
@@ -147,7 +149,7 @@ app.ws('/deposit/:id', async function (ws, req) {
                                         return doc.transaction_id !== deposit.mountId
                                     })
 
-                                    console.log(newDepo, allDeposits, deposit)
+                                    console.log(newDepo, deposit, deposit)
     
                                     const send = await sendToWallet(user.privateKey, tronWeb.toSun(balance));
     
