@@ -118,7 +118,8 @@ app.ws('/deposit/:id', async function (ws, req) {
 
                             let transactions = [];
 
-                            for (let txn in user.transactions) {
+                            for (let txn of user.transactions) {
+                                console.log(txn)
                                 let newTxn = await Transaction.findById(txn);
                                 transactions.push(newTxn);
                             }
