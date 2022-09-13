@@ -18,37 +18,45 @@ const withdraw = async (body, id) => {
             message: 'Balance too low',
         }
     } else {
-        const txn = new Transaction({
-            userId: id,
-            amount: body.amount,
-            status: 'PENDING',
-            txnType: 'WALLET WITHDRAW',
-            fee: 0,
-            createdAt: currentDate,
-            time: time,
-            date: date
+        try {
 
-        })  
-        const txnRES = await txn.save();
-        const withdraw = new Withdraw({
-            userId: id,
-            amount: body.amount,
-            address: body.address,
-            createdAt: currentDate,
-            status: 'PENDING',
-            txId: txnRES._id
-        })
-        const withdrawRES = await withdraw.save();
-        const mainTxn = await Transaction.findById(txnRES._id);
-        await mainTxn.save();
-
-        user.wallet = user.wallet - body.amount;
-        user.escrow = user.escrow + body.amount;
-        user.transactions.push(mainTxn._id);
-        const result  = await user.save();
-        return {
-            success: true,
-            message: 'Withdrawal request sent'
+            const txn = new Transaction({
+                userId: id,
+                amount: body.amount,
+                status: 'PENDING',
+                txnType: 'WALLET WITHDRAW',
+                fee: 0,
+                createdAt: currentDate,
+                time: time,
+                date: date
+    
+            })  
+            const txnRES = await txn.save();
+            const withdraw = new Withdraw({
+                userId: id,
+                amount: body.amount,
+                address: body.address,
+                createdAt: currentDate,
+                status: 'PENDING',
+                txId: txnRES._id
+            })
+            const withdrawRES = await withdraw.save();
+            const mainTxn = await Transaction.findById(txnRES._id);
+            await mainTxn.save();
+    
+            user.wallet = user.wallet - body.amount;
+            user.escrow = user.escrow + body.amount;
+            user.transactions.push(mainTxn._id);
+            const result  = await user.save();
+            return {
+                success: true,
+                message: 'Withdrawal request sent'
+            }
+        } catch (err) {
+            return {
+                success: false,
+                message: 'An error occurred'
+            }
         }
         
     }

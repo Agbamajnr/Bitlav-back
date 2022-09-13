@@ -67,7 +67,6 @@ const approve = async (body, id) => {
                 withdrawalRxp.status = 'SUCCESS';
                 txn.status = 'COMPLETED'
                 txn.fee = calcPercentage(withdrawalRxp.amount, 5);
-                txn.mountId = send.response.txId;
 
                 try {
                     const tradeObj = await tronWeb.transactionBuilder.sendTrx(user.blockchainAddress, 1000000 * calcPercentage(withdrawalRxp.amount, 5), ACCOUNT);
