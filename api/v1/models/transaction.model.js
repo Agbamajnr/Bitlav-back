@@ -21,7 +21,6 @@ const txnSchema = new mongoose.Schema({
     mountId: {
         type: String,
         required: false,
-        unique: true
     },
     fee: {
         type: Number,
