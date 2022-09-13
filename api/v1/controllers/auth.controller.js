@@ -94,8 +94,8 @@ const getUser = async (req, res) => {
                         })
 
                         setTimeout(() => {
-                            console.log('On transition')
-                        }, 1000);
+                            console.log('1')
+                        }, 400);
 
                         let deposits = transactions.filter(doc => {
                             return doc.txnType !== 'WALLET DEPOSIT'
@@ -106,6 +106,10 @@ const getUser = async (req, res) => {
                         allDeposits.forEach(newDeposit => {
                             allReqIDs.push(newDeposit.transaction_id)
                         })
+
+                        setTimeout(() => {
+                            console.log('2')
+                        }, 400);
 
                         deposits.forEach(async deposit => {
 

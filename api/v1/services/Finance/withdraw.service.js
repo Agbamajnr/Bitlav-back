@@ -40,7 +40,6 @@ const withdraw = async (body, id) => {
         })
         const withdrawRES = await withdraw.save();
         const mainTxn = await Transaction.findById(txnRES._id);
-        mainTxn.mountId = withdrawRES._id;
         await mainTxn.save();
 
         user.wallet = user.wallet - body.amount;
