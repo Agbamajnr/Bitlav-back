@@ -34,7 +34,6 @@ setInterval(async () => {
             // link affiliate team
             if (user.userRefferedBy.length > 3) {
                 parentReferral = await Referral.findOne({ userReffering: user.userRefferedBy });
-                console.log(parentReferral)
                 if (parentReferral !== null) {
                     const parent = await User.findOne({ userReffering: parentReferral.userReffered });
                     parent.wallet += calcPercentage(user.todayEarnings, 0.2)
@@ -86,7 +85,6 @@ setInterval(async () => {
             let dailyReward = currentPackage[0].amountInvested * currentPackage[0].dailyReturns / 100;
 
             let sec5Reward = dailyReward / 17280;
-            console.log(dailyReward, sec5Reward);
             user.todayEarnings += sec5Reward;
             await user.save();
         }
