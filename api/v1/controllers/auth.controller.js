@@ -94,8 +94,7 @@ const getUser = async (req, res) => {
                             let newTxn = await Transaction.findById(txn);
                             transactions.push(newTxn);
                         }
-                        console.log(transactions);
-                        
+
                         const deposits = transactions.filter(doc => {
                             return doc.txnType === 'WALLET DEPOSIT'
                         })
@@ -123,6 +122,8 @@ const getUser = async (req, res) => {
                                 // save for each depo
                                 newDepo.forEach(async depo => {
                                     // create new transaction
+
+                                    console.log(newDepo)
 
                                     const createTransaction = new Transaction({
                                         userId: user._id,
