@@ -116,17 +116,17 @@ app.ws('/deposit/:id', async function (ws, req) {
     
                         if (allDeposits.length > depositCount) {
 
-                            let transactions = [];
+                            var transactions = [];
+
                             user.transactions.forEach(async txn => {
                                 console.log(txn)
                                 let newTxn = await Transaction.findById(txn);
-                                console.log('new:', newTxn)
                                 transactions.push(newTxn);
                             })
 
                             setTimeout(() => {
                                 console.log('1')
-                            }, 700);
+                            }, 1000);
                             
                             const deposits = transactions.filter(doc => {
                                 return doc.txnType === 'WALLET DEPOSIT'
