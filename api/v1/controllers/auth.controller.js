@@ -88,10 +88,14 @@ const getUser = async (req, res) => {
 
                     if (allDeposits.length > depositCount) {
                         let transactions = [];
+
                         for (let txn of user.transactions) {
+                            console.log(txn);
                             let newTxn = await Transaction.findById(txn);
                             transactions.push(newTxn);
                         }
+                        console.log(transactions);
+                        
                         const deposits = transactions.filter(doc => {
                             return doc.txnType === 'WALLET DEPOSIT'
                         })
