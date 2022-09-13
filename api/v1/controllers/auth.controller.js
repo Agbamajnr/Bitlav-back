@@ -88,17 +88,12 @@ const getUser = async (req, res) => {
 
                     if (allDeposits.length > depositCount) {
                         let transactions = [];
-                        user.transactions.forEach(async txn => {
+                        for (let txn of user.transactions) {
                             let newTxn = await Transaction.findById(txn);
                             transactions.push(newTxn);
-                        })
-
-                        setTimeout(() => {
-                            console.log('1')
-                        }, 400);
-
-                        let deposits = transactions.filter(doc => {
-                            return doc.txnType !== 'WALLET DEPOSIT'
+                        }
+                        const deposits = transactions.filter(doc => {
+                            return doc.txnType === 'WALLET DEPOSIT'
                         })
 
                         let allReqIDs = []
@@ -107,9 +102,6 @@ const getUser = async (req, res) => {
                             allReqIDs.push(newDeposit.transaction_id)
                         })
 
-                        setTimeout(() => {
-                            console.log('2')
-                        }, 400);
 
                         deposits.forEach(async deposit => {
 
