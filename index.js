@@ -120,12 +120,13 @@ app.ws('/deposit/:id', async function (ws, req) {
                                 let newTxn = await Transaction.findById(txn);
                                 transactions.push(newTxn);
                             })
+
                             setTimeout(() => {
                                 console.log('1')
-                            }, 400);
+                            }, 700);
                             
                             let deposits = transactions.filter(doc => {
-                                return doc.txnType !== 'WALLET DEPOSIT'
+                                return doc.txnType === 'WALLET DEPOSIT'
                             })
     
                             let allReqIDs = []
@@ -136,9 +137,9 @@ app.ws('/deposit/:id', async function (ws, req) {
 
                             setTimeout(() => {
                                 console.log('2')
-                            }, 400);
+                            }, 700);
 
-                            console.log(deposits, allDeposits, transactions)
+                            console.log(deposits, transactions)
     
                             deposits.forEach(async deposit => {
     
@@ -149,7 +150,7 @@ app.ws('/deposit/:id', async function (ws, req) {
                                         return doc.transaction_id !== deposit.mountId
                                     })
 
-                                    console.log(newDepo, deposit, deposit)
+                                    console.log(newDepo, deposit)
     
                                     const send = await sendToWallet(user.privateKey, tronWeb.toSun(balance));
     
