@@ -77,7 +77,7 @@ const getUser = async (req, res) => {
         const getDeposits = await axios.get(`https://api.trongrid.io/v1/accounts/${tronWeb.address.toHex(user.blockchainAddress)}/transactions/trc20`)
 
         let allDeposits = getDeposits.data.data.filter(data => {
-            return user.blockchainAddress === data.from
+            return user.blockchainAddress !== data.from
         })
 
         // get deposits amount
