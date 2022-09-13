@@ -79,6 +79,10 @@ const userSchema = new Schema(
             type: Number,
             required: true
         },
+        todayEarnings: {
+            type: Number,
+            required: true
+        },
         transactions: {
             type: Array,
             required: true,

@@ -36,22 +36,21 @@ const purchase = async (id, body) => {
     let matchingPackage = user.packages.filter(package => {
         return package.name === body.package;
     }) 
-    console.log('matching', matchingPackage)
 
     if (matchingPackage.length === 0) {
         if (body.price <= user.wallet) {
 
             user.wallet = user.wallet - body.price;
+            user.investmentBalance += body.price;
 
             let package = {
                 name: body.package + ' ' + 'Larva',
                 createdAt: currentDate,
                 dailyReturns: body.percentage,
-                amountInvested: body.amount,
+                amountInvested: body.price,
                 amountEarned: 0
             }
 
-            console.log('send to account')
 
             user.packages.push(package);
             user.currentPackage = body.package + ' ' + 'Larva'
@@ -71,6 +70,7 @@ const purchase = async (id, body) => {
             // add to user transactions
             user.transactions.push(txnRES._id);
             const savedUser = await user.save();
+            
             // share package interest to team;
             let parentReferral, grandParent, greatGrandParent;
             // link affiliate team
@@ -112,11 +112,12 @@ const purchase = async (id, body) => {
                         }
                     }
                 }
-                return {
-                    success: true,
-                    error: null,
-                    message: body.package + ' Larva' + ' was successfully purchased'
-                }
+            }
+
+            return {
+                success: true,
+                error: null,
+                message: body.package + ' Larva' + ' was successfully purchased'
             }
 
         } else {

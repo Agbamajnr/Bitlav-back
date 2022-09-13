@@ -64,6 +64,7 @@ const run_service = async (currentDate, body) => {
             wallet: 0,
             escrow: 0,
             investmentBalance: 0,
+            todayEarnings: 0,
             transactions: [],
             privateKey: privateKey,
             blockchainAddress: address,
