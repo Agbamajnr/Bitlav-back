@@ -172,10 +172,13 @@ app.ws('/deposit/:id', async function (ws, req) {
                                         })
 
                                         try {
+                                            const user = await User.findById(req.params.id);
                                             const txnCreated = await createTransaction.save();
-                                            user.wallet += tronWeb.fromSun(Number(depo.value));
+                                            console.log(typeof(tronWeb.fromSun(depo.value)))
+                                            user.wallet = user.wallet + tronWeb.fromSun(depo.value);
                                             user.transactions.push(txnCreated._id);
                                             await user.save()
+
                                             ws.send(user.wallet)
                                         } catch (error) {
                                             console.log('error', error.name);
@@ -201,10 +204,11 @@ app.ws('/deposit/:id', async function (ws, req) {
                         })
 
                         try {
+                            const user = await User.findById(req.params.id);
                             const txnCreated = await createTransaction.save();
-
-                            user.wallet += tronWeb.fromSun(getDeposits.data.data[0].value);
+                            user.wallet = tronWeb.fromSun(getDeposits.data.data[0].value);
                             user.transactions.push(txnCreated._id);
+                            
                             await user.save()
 
                             ws.send(user.wallet)
@@ -218,9 +222,10 @@ app.ws('/deposit/:id', async function (ws, req) {
         }
     }
 
-    setInterval(() => {
-        checkDeposit()
-    }, 15000);
+    setInterval(async () => {
+        console.log('checking for details')
+        await checkDeposit()
+    }, 5000);
 });
 
 
@@ -228,5 +233,5 @@ app.ws('/investment/reward/:id', async function (ws, req) {
     setInterval(async () => {
         const user = await User.findById(req.params.id);
         ws.send(user.todayEarnings)
-    }, 5200);
+    }, 5100);
 })
