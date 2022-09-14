@@ -153,12 +153,13 @@ app.ws('/deposit/:id', async function (ws, req) {
 
                                 if (mountIds.includes(request.transaction_id) === false) {
 
-                                    let newDepo;
+                                    let newDepo = [];
 
                                     mountIds.forEach(mount => {
                                         let newDepos = allDeposits.filter(doc => {
                                             return doc.transaction_id !== mount
                                         })
+                                        newDepo = newDepos;
                                     })
 
                                     console.log('new-depos',newDepo)
