@@ -32,48 +32,44 @@ const tronWeb = new TronWeb(fullNode, solidityNode, eventServer, privateKey);
 
 const purchase = async (id, body) => {
     const user = await User.findById(id);
-
+    
     let matchingPackage = user.packages.filter(package => {
         return package.name === body.package;
-    })
+    }) 
 
     if (matchingPackage.length === 0) {
         if (body.price <= user.wallet) {
 
-            try {
-                user.wallet = user.wallet - body.price;
-                user.investmentBalance += body.price;
+            user.wallet = user.wallet - body.price;
+            user.investmentBalance += body.price;
 
-                let package = {
-                    name: body.package + ' ' + 'Larva',
-                    createdAt: currentDate,
-                    dailyReturns: body.percentage,
-                    amountInvested: body.price,
-                    amountEarned: 0
-                }
-
-
-                user.packages.push(package);
-                user.currentPackage = body.package + ' ' + 'Larva'
-
-                const txn = new Transaction({
-                    userId: user._id,
-                    amount: body.price,
-                    status: 'COMPLETED',
-                    txnType: 'PURCHASE PACKAGE',
-                    fee: 0,
-                    createdAt: currentDate,
-                    time: time,
-                    date: date,
-                })
-                const txnRES = await txn.save();
-                // add to user transactions
-                user.transactions.push(txnRES._id);
-                const savedUser = await user.save();
-            } catch (error) {
-                console.log(error.name)
+            let package = {
+                name: body.package + ' ' + 'Larva',
+                createdAt: currentDate,
+                dailyReturns: body.percentage,
+                amountInvested: body.price,
+                amountEarned: 0
             }
 
+
+            user.packages.push(package);
+            user.currentPackage = body.package + ' ' + 'Larva'
+
+            const txn = new Transaction({
+                userId: user._id,
+                amount: body.price,
+                status: 'COMPLETED',
+                txnType: 'PURCHASE PACKAGE',
+                fee: 0,
+                createdAt: currentDate,
+                time: time,
+                date: date,
+            })
+            const txnRES = await txn.save();
+            // add to user transactions
+            user.transactions.push(txnRES._id);
+            const savedUser = await user.save();
+            
             // share package interest to team;
             let parentReferral, grandParent, greatGrandParent;
             // link affiliate team
