@@ -75,10 +75,9 @@ app.ws('/deposit/:id', async function (ws, req) {
     console.log(req.params.id)
     const user = await User.findById(req.params.id);
 
-    checkDeposit()
-
+    
     async function checkDeposit() {
-
+        
         if (user !== null) {
 
 
@@ -159,6 +158,7 @@ app.ws('/deposit/:id', async function (ws, req) {
                                     // save for each depo
                                     newDepo.forEach(async depo => {
                                         // create new transaction
+                                        console.log(typeof(tronWeb.fromSun(depo.value)))
 
                                         const createTransaction = new Transaction({
                                             userId: user._id,
@@ -174,7 +174,9 @@ app.ws('/deposit/:id', async function (ws, req) {
                                         try {
                                             const user = await User.findById(req.params.id);
                                             const txnCreated = await createTransaction.save();
+
                                             console.log(typeof(tronWeb.fromSun(depo.value)))
+
                                             user.wallet = user.wallet + tronWeb.fromSun(depo.value);
                                             user.transactions.push(txnCreated._id);
                                             await user.save()
@@ -225,9 +227,12 @@ app.ws('/deposit/:id', async function (ws, req) {
         }
     }
 
+    checkDeposit()
+
+
     setInterval(async () => {
         console.log('checking for details')
-        await checkDeposit()
+        checkDeposit()
     }, 20000);
 });
 
