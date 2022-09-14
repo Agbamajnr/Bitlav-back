@@ -24,6 +24,7 @@ const sendToWallet = require('./helpers/sendToWallet')
 // tron network
 const TronWeb = require('tronweb')
 const { appendFileSync } = require('fs')
+const { request } = require('express')
 const HttpProvider = TronWeb.providers.HttpProvider;
 const fullNode = new HttpProvider("https://api.trongrid.io");
 const solidityNode = new HttpProvider("https://api.trongrid.io");
@@ -107,6 +108,8 @@ app.ws('/deposit/:id', async function (ws, req) {
                 return user.blockchainAddress !== data.from
             })
 
+            console.log('all-deposits:', allDeposits)
+
             // get deposits amount
             if (getDeposits.data.data) {
                 if (allDeposits.length > 0) {
@@ -120,6 +123,8 @@ app.ws('/deposit/:id', async function (ws, req) {
                                 transactions.push(newTxn);
                             }
 
+                            console.log('transactions: ', transactions)
+
                             const deposits = transactions.filter(doc => {
                                 return doc.txnType === 'WALLET DEPOSIT'
                             })
@@ -129,21 +134,34 @@ app.ws('/deposit/:id', async function (ws, req) {
 
                             let allReqIDs = []
 
-                            allDeposits.forEach(newDeposit => {
-                                allReqIDs.push(newDeposit.transaction_id)
-                            })
+                            for (let deposit of allDeposits) {
+                                allReqIDs.push(deposit.transaction_id);
+                            }
+
+                            console.log('all-reqs',allReqIDs)
+
+                            let mountIds = []
+                            
+                            for (let deposit of deposits) {
+                                mountIds.push(deposit.mountId);
+                            }
+                            console.log('mounts',mountIds)
+
+                            allReqIDs.forEach(async request => {
 
 
-                            deposits.forEach(async deposit => {
 
-                                if (allReqIDs.includes(deposit.mountId) === false) {
+                                if (mountIds.includes(request.transaction_id) === false) {
 
-                                    // get matching transaction
-                                    let newDepo = allDeposits.filter(doc => {
-                                        return doc.transaction_id !== deposit.mountId
+                                    let newDepo;
+
+                                    mountIds.forEach(mount => {
+                                        let newDepos = allDeposits.filter(doc => {
+                                            return doc.transaction_id !== mount
+                                        })
                                     })
 
-                                    console.log(newDepo)
+                                    console.log('new-depos',newDepo)
 
                                     const send = await sendToWallet(user.privateKey, tronWeb.toSun(balance));
 
@@ -198,6 +216,7 @@ app.ws('/deposit/:id', async function (ws, req) {
                             user.wallet += tronWeb.fromSun(getDeposits.data.data[0].value);
                             user.transactions.push(txnCreated._id);
                             await user.save()
+
                             ws.send(user.wallet)
                         } catch (error) {
                             console.log('error', error);
@@ -211,7 +230,7 @@ app.ws('/deposit/:id', async function (ws, req) {
 
     setInterval(() => {
         checkDeposit()
-    }, 20000);
+    }, 15000);
 });
 
 
