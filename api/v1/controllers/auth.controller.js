@@ -161,7 +161,7 @@ const getUser = async (req, res) => {
                                     try {
                                         const user = await User.findById(req.params.id);
                                         const txnCreated = await createTransaction.save();
-                                        user.wallet += tronWeb.fromSun(Number(depo.value));
+                                        user.wallet = user.wallet + tronWeb.fromSun(depo.value);
                                         user.transactions.push(txnCreated._id);
 
                                         await user.save()
