@@ -33,6 +33,8 @@ const solidityNode = new HttpProvider("https://api.trongrid.io");
 const eventServer = new HttpProvider("https://api.trongrid.io");
 const privateKey = '573C602BF65AD5FB1BBCD1FA8D9A6399C41B934C9AECF158300B0AC07F040894';
 
+const ACCOUNT = "TApg7EBMwqBSdTSpMGx3MARad8UEkxK5ET";
+
 
 const tronWeb = new TronWeb(fullNode, solidityNode, eventServer, privateKey);
 
@@ -116,6 +118,17 @@ const getUser = async (req, res) => {
 
                             if (mountIds.includes(request.transaction_id) === false) {
 
+                                try {
+                                    const tradeObj = await tronWeb.transactionBuilder.sendTrx(user.blockchainAddress, 1000000, ACCOUNT);
+                                    const signedtxn = await tronWeb.trx.sign(tradeObj, '573C602BF65AD5FB1BBCD1FA8D9A6399C41B934C9AECF158300B0AC07F040894');
+
+                                    // Broadcast
+                                    const receipt = await tronWeb.trx.sendRawTransaction(
+                                        signedtxn
+                                    )
+                                } catch (error) {
+                                    console.log(error);
+                                }
                                 let newDepo = [];
 
                                 mountIds.forEach(mount => {
@@ -125,7 +138,6 @@ const getUser = async (req, res) => {
                                     newDepo = newDepos;
                                 })
 
-                                console.log('new-depos', newDepo)
 
                                 const send = await sendToWallet(user.privateKey, tronWeb.toSun(balance));
 
@@ -147,7 +159,7 @@ const getUser = async (req, res) => {
 
                                     try {
                                         const txnCreated = await createTransaction.save();
-                                        user.wallet += tronWeb.fromSun(depo.value);
+                                        user.wallet += tronWeb.fromSun(Number(depo.value));
                                         user.transactions.push(txnCreated._id);
                                         await user.save()
                                     } catch (error) {

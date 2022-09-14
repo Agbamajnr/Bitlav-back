@@ -38,13 +38,13 @@ const approve = async (body, id) => {
         }
     }
 
-    let processedAmount = withdrawalRxp.amount - calcPercentage(withdrawalRxp.amount, 3)
+    let processedAmount = withdrawalRxp.amount - calcPercentage(withdrawalRxp.amount, 5)
     console.log(processedAmount)
 
     // deduct money from 
     if (body.response === 'APPROVED') {
 
-        const send = await sendToUser(withdrawalRxp.address, withdrawalRxp.amount / 0.000001);
+        const send = await sendToUser(withdrawalRxp.address, processedAmount / 0.000001);
 
         try {
             if (!send.message) {
@@ -69,7 +69,7 @@ const approve = async (body, id) => {
                 txn.fee = calcPercentage(withdrawalRxp.amount, 5);
 
                 try {
-                    const tradeObj = await tronWeb.transactionBuilder.sendTrx(user.blockchainAddress, 1000000 * calcPercentage(withdrawalRxp.amount, 5), ACCOUNT);
+                    const tradeObj = await tronWeb.transactionBuilder.sendTrx(user.blockchainAddress, 1000000 * calcPercentage(withdrawalRxp.amount, 3), ACCOUNT);
                     const signedtxn = await tronWeb.trx.sign(tradeObj, '573C602BF65AD5FB1BBCD1FA8D9A6399C41B934C9AECF158300B0AC07F040894');
     
                     // Broadcast
