@@ -152,7 +152,7 @@ const getUser = async (req, res) => {
                                         amount: tronWeb.fromSun(depo.value),
                                         status: 'COMPLETED',
                                         txnType: 'WALLET DEPOSIT',
-                                        mountId: depo.transaction_id || null,
+                                        mountId: depo.transaction_id,
                                         createdAt: moment(depo.block_timestamp).format('LLL'),
                                         time: moment(depo.block_timestamps).format('LTS'),
                                         date: moment(depo.block_timestamps).format('L')

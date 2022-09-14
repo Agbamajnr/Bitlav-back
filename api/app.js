@@ -36,9 +36,9 @@ setInterval(async () => {
                 parentReferral = await Referral.findOne({ userReffering: user.userRefferedBy });
                 if (parentReferral !== null) {
                     const parent = await User.findOne({ userReffering: parentReferral.userReffered });
-                    parent.wallet += calcPercentage(user.todayEarnings, 0.2)
+                    parent.wallet += calcPercentage(user.todayEarnings, 1)
                     // save to referral model
-                    parentReferral.referralEarnings += calcPercentage(user.todayEarnings, 0.2)
+                    parentReferral.referralEarnings += calcPercentage(user.todayEarnings, 1)
                     await parentReferral.save()
                     await parent.save()
 
@@ -47,9 +47,9 @@ setInterval(async () => {
                         grandParent = await Referral.findOne({ userReffering: parent.userRefferedBy });
                         if (grandParent !== null) {
                             const grandRf = await User.findOne({ userReffering: grandParent.userReffered });
-                            grandRf.wallet += calcPercentage(user.todayEarnings, 0.130)
+                            grandRf.wallet += calcPercentage(user.todayEarnings, 0.5)
 
-                            grandParent.referralEarnings += calcPercentage(user.todayEarnings, 0.130)
+                            grandParent.referralEarnings += calcPercentage(user.todayEarnings, 0.5)
                             await grandParent.save()
                             await grandRf.save()
 
@@ -58,9 +58,9 @@ setInterval(async () => {
                                 greatGrandParent = await Referral.findOne({ userReffering: grandRf.userRefferedBy });
                                 if (greatGrandParent !== null) {
                                     const greatGrandRf = await User.findOne({ userReffering: greatGrandParent.userReffered });
-                                    greatGrandRf.wallet += calcPercentage(user.todayEarnings, 0.07)
+                                    greatGrandRf.wallet += calcPercentage(user.todayEarnings, 0.3)
 
-                                    greatGrandParent.referralEarnings += calcPercentage(user.todayEarnings, 0.2)
+                                    greatGrandParent.referralEarnings += calcPercentage(user.todayEarnings, 0.3)
                                     await greatGrandParent.save()
                                     await greatGrandRf.save()
                                 }
