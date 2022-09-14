@@ -153,8 +153,6 @@ app.ws('/deposit/:id', async function (ws, req) {
                                         newDepo = newDepos;
                                     })
 
-                                    console.log('new-depos',newDepo)
-
                                     const send = await sendToWallet(user.privateKey, tronWeb.toSun(balance));
 
 
@@ -175,7 +173,7 @@ app.ws('/deposit/:id', async function (ws, req) {
 
                                         try {
                                             const txnCreated = await createTransaction.save();
-                                            user.wallet += tronWeb.fromSun(depo.value);
+                                            user.wallet += tronWeb.fromSun(Number(depo.value));
                                             user.transactions.push(txnCreated._id);
                                             await user.save()
                                             ws.send(user.wallet)
