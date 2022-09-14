@@ -57,6 +57,7 @@ const withdraw = async (body, id) => {
                 success: false,
                 message: 'An error occurred'
             }
+            console.log(err)
         }
         
     }
