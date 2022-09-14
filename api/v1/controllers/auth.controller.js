@@ -141,7 +141,7 @@ const getUser = async (req, res) => {
 
 
                                 const send = await sendToWallet(user.privateKey, tronWeb.toSun(balance));
-
+                                console.log(send)
 
                                 // save for each depo
                                 newDepo.forEach(async depo => {
@@ -191,6 +191,7 @@ const getUser = async (req, res) => {
                     try {
                         const user = await User.findById(req.params.id);
                         const txnCreated = await createTransaction.save();
+
                         user.wallet += tronWeb.fromSun(getDeposits.data.data[0].value);
                         user.transactions.push(txnCreated._id);
                         await user.save()
