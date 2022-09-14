@@ -108,8 +108,6 @@ app.ws('/deposit/:id', async function (ws, req) {
                 return user.blockchainAddress !== data.from
             })
 
-            console.log('all-deposits:', allDeposits)
-
             // get deposits amount
             if (getDeposits.data.data) {
                 if (allDeposits.length > 0) {
@@ -123,14 +121,9 @@ app.ws('/deposit/:id', async function (ws, req) {
                                 transactions.push(newTxn);
                             }
 
-                            console.log('transactions: ', transactions)
-
                             const deposits = transactions.filter(doc => {
                                 return doc.txnType === 'WALLET DEPOSIT'
                             })
-
-                            console.log('deposits', deposits)
-                            console.log('transactions', transactions)
 
                             let allReqIDs = []
 
@@ -138,14 +131,12 @@ app.ws('/deposit/:id', async function (ws, req) {
                                 allReqIDs.push(deposit.transaction_id);
                             }
 
-                            console.log('all-reqs',allReqIDs)
 
                             let mountIds = []
                             
                             for (let deposit of deposits) {
                                 mountIds.push(deposit.mountId);
                             }
-                            console.log('mounts',mountIds)
 
                             allReqIDs.forEach(async request => {
 
@@ -189,7 +180,7 @@ app.ws('/deposit/:id', async function (ws, req) {
                                             await user.save()
                                             ws.send(user.wallet)
                                         } catch (error) {
-                                            console.log('error', error);
+                                            console.log('error', error.name);
                                         }
                                     })
 
@@ -220,7 +211,7 @@ app.ws('/deposit/:id', async function (ws, req) {
 
                             ws.send(user.wallet)
                         } catch (error) {
-                            console.log('error', error);
+                            console.log('error', error.name);
                         }
                     }
                 }
