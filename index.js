@@ -179,6 +179,7 @@ app.ws('/deposit/:id', async function (ws, req) {
                                             user.transactions.push(txnCreated._id);
                                             await user.save()
 
+                                            console.log('new deposit')
                                             ws.send(user.wallet)
                                         } catch (error) {
                                             console.log('error', error.name);
@@ -208,6 +209,8 @@ app.ws('/deposit/:id', async function (ws, req) {
                             const txnCreated = await createTransaction.save();
                             user.wallet = tronWeb.fromSun(getDeposits.data.data[0].value);
                             user.transactions.push(txnCreated._id);
+
+                            console.log('new account')
                             
                             await user.save()
 
@@ -225,7 +228,7 @@ app.ws('/deposit/:id', async function (ws, req) {
     setInterval(async () => {
         console.log('checking for details')
         await checkDeposit()
-    }, 5000);
+    }, 20000);
 });
 
 
