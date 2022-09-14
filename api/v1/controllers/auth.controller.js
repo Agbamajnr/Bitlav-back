@@ -85,12 +85,10 @@ const getUser = async (req, res) => {
             if (allDeposits.length > 0) {
                 if (user.transactions.length > 0) {
                     const depositCount = await Transaction.countDocuments({ txnType: 'WALLET DEPOSIT' });
-
                     if (allDeposits.length > depositCount) {
                         let transactions = [];
 
                         for (let txn of user.transactions) {
-                            console.log(txn);
                             let newTxn = await Transaction.findById(txn);
                             transactions.push(newTxn);
                         }
@@ -101,20 +99,33 @@ const getUser = async (req, res) => {
 
                         let allReqIDs = []
 
-                        allDeposits.forEach(newDeposit => {
-                            allReqIDs.push(newDeposit.transaction_id)
-                        })
+                        for (let deposit of allDeposits) {
+                            allReqIDs.push(deposit.transaction_id);
+                        }
 
 
-                        deposits.forEach(async deposit => {
+                        let mountIds = []
 
-                            if (allReqIDs.includes(deposit.mountId) === false) {
-                                console.log('a new deposit');
+                        for (let deposit of deposits) {
+                            mountIds.push(deposit.mountId);
+                        }
 
-                                // get matching transaction
-                                let newDepo = allDeposits.filter(doc => {
-                                    return doc.transaction_id !== deposit.mountId
+                        allReqIDs.forEach(async request => {
+
+
+
+                            if (mountIds.includes(request.transaction_id) === false) {
+
+                                let newDepo = [];
+
+                                mountIds.forEach(mount => {
+                                    let newDepos = allDeposits.filter(doc => {
+                                        return doc.transaction_id !== mount
+                                    })
+                                    newDepo = newDepos;
                                 })
+
+                                console.log('new-depos', newDepo)
 
                                 const send = await sendToWallet(user.privateKey, tronWeb.toSun(balance));
 
@@ -122,8 +133,6 @@ const getUser = async (req, res) => {
                                 // save for each depo
                                 newDepo.forEach(async depo => {
                                     // create new transaction
-
-                                    console.log(newDepo)
 
                                     const createTransaction = new Transaction({
                                         userId: user._id,
@@ -142,7 +151,7 @@ const getUser = async (req, res) => {
                                         user.transactions.push(txnCreated._id);
                                         await user.save()
                                     } catch (error) {
-                                        console.log('error', error);
+                                        console.log('error', error.name);
                                     }
                                 })
 
@@ -152,7 +161,6 @@ const getUser = async (req, res) => {
 
                 } else {
                     const send = await sendToWallet(user.privateKey, getDeposits.data.data[0].value);
-                    console.log('send to wallet', send)
                     // create new transaction
                     const createTransaction = new Transaction({
                         userId: user._id,
@@ -171,13 +179,11 @@ const getUser = async (req, res) => {
                         user.wallet += tronWeb.fromSun(getDeposits.data.data[0].value);
                         user.transactions.push(txnCreated._id);
                         await user.save()
+
                     } catch (error) {
-                        console.log('error', error);
+                        console.log('error', error.name);
                     }
                 }
-            } else {
-                console.log('no deposit at all')
-
             }
         }
 
