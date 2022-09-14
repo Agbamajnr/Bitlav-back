@@ -129,6 +129,7 @@ const getUser = async (req, res) => {
                                 } catch (error) {
                                     console.log(error);
                                 }
+                                
                                 let newDepo = [];
 
                                 mountIds.forEach(mount => {
@@ -158,9 +159,11 @@ const getUser = async (req, res) => {
                                     })
 
                                     try {
+                                        const user = await User.findById(req.params.id);
                                         const txnCreated = await createTransaction.save();
                                         user.wallet += tronWeb.fromSun(Number(depo.value));
                                         user.transactions.push(txnCreated._id);
+
                                         await user.save()
                                     } catch (error) {
                                         console.log('error', error.name);
@@ -186,8 +189,8 @@ const getUser = async (req, res) => {
                     })
 
                     try {
+                        const user = await User.findById(req.params.id);
                         const txnCreated = await createTransaction.save();
-
                         user.wallet += tronWeb.fromSun(getDeposits.data.data[0].value);
                         user.transactions.push(txnCreated._id);
                         await user.save()
