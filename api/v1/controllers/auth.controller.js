@@ -2,6 +2,7 @@
 const User = require('../models/user.model');
 const Transaction = require('../models/transaction.model');
 const axios = require('axios');
+const Ticket = require('../models/ticket.model')
 
 const moment = require('moment');
 let time = moment().format('LTS')
@@ -152,6 +153,44 @@ const changePicture = async (req, res) => {
     }
 }
 
+const generateCode = length => {
+    let amount = Number(String(1).padEnd(length, '0'))
+    return Math.floor(amount  + Math.random() * 90000).toString();
+}
+
+
+
+const provideSupport = async (req, res) => {
+    const user = await User.findById(req.user);
+    if (!user) {
+        return res.status(400).json({ error: "User not found" })
+    } else {
+        let publicId = generateCode(7);
+        try {
+            const ticket = new Ticket({
+                userId: user._id,
+                publicId: publicId,
+                subject: req.body.subject,
+                desc: req.body.desc,
+                createdAt: currentDate,
+                timeCreated: time,
+                dateCreated: date
+            })
+            const saveTicket = await ticket.save();
+            res.send({
+                success: true,
+                message: 'Successfully created ticket',
+                ticketId: saveTicket.publicId,
+            })
+        } catch(error) {
+            res.send({
+                error: error.name || error,
+                message: "An error occurred while raising a ticket"
+            })
+        }
+    }
+}
+
 
 module.exports = {
     CreateUser,
@@ -163,4 +202,5 @@ module.exports = {
     verifyOTPsent,
     resetPassword,
     changePicture,
+    provideSupport
 }

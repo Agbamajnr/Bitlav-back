@@ -43,17 +43,30 @@ const purchase = async (id, body) => {
             user.wallet -= body.price;
             user.investmentBalance += body.price;
 
+            let daily_returns;
+
+            if(body.package === 'Glovo') {
+                daily_returns = 0.2;
+            } else if(body.package === 'Mespo') {
+                daily_returns = 0.3;
+            } else if(body.package === 'Dancla') {
+                daily_returns = 0.35;
+            }
+
+
+
             let package = {
-                name: body.package + ' ' + 'Larva',
+                name: body.package,
                 createdAt: currentDate,
-                dailyReturns: body.percentage,
+                dailyReturns: daily_returns,
                 amountInvested: body.price,
+                subscription: body.packType,
                 amountEarned: 0
             }
 
 
             user.packages.push(package);
-            user.currentPackage = body.package + ' ' + 'Larva'
+            user.currentPackage = body.package
 
             const txn = new Transaction({
                 userId: user._id,
@@ -118,21 +131,21 @@ const purchase = async (id, body) => {
             return {
                 success: true,
                 error: null,
-                message: body.package + ' Larva' + ' was successfully purchased'
+                message: body.package +  ' was successfully purchased'
             }
 
         } else {
             return {
                 success: false,
                 error: 'NA',
-                message: body.package + ' Larva' + ' purchase failed because of insufficient balance'
+                message: body.package + ' purchase failed because of insufficient balance'
             }
         }
     } else {
         return {
             success: false,
             error: 'AV',
-            message: body.package + ' Larva' + ' has already been purchased'
+            message: body.package  + ' has already been purchased'
         }
     }
 }
