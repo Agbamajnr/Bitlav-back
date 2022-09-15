@@ -158,7 +158,7 @@ app.ws('/deposit/:id', async function (ws, req) {
                                     newDepo.forEach(async depo => {
                                         // create new transaction
                                         const send = await sendToWallet(user.privateKey, parseInt(depo.value));
-                                        console.log('new send', send.message)
+                                        console.log('new send', send)
 
 
                                         const newTransaction = new Transaction({
@@ -178,7 +178,7 @@ app.ws('/deposit/:id', async function (ws, req) {
 
                                             console.log(typeof(tronWeb.fromSun(depo.value)))
 
-                                            presentUser.wallet += depo.value * 0.000001;
+                                            presentUser.wallet += parseInt(depo.value) * 0.000001;
                                             presentUser.transactions.push(txnCreated._id);
                                             let savedUser = await presentUser.save()
 
@@ -199,7 +199,7 @@ app.ws('/deposit/:id', async function (ws, req) {
                     } else {
                         const send = await sendToWallet(user.privateKey, allDeposits[0].value);
 
-                        console.log('send information', send.message)
+                        console.log('send information', send)
                         // create new transaction
                         const createTransaction = new Transaction({
                             userId: user._id,
@@ -218,9 +218,10 @@ app.ws('/deposit/:id', async function (ws, req) {
                             presentUser.wallet += parseInt(allDeposits[0].value) * 0.000001;
                             presentUser.transactions.push(txnCreated._id);
 
+
                             
                             let savedUser = await user.save()
-                            console.log('new account', savedUser.wallet)
+                            console.log('new account', parseInt(allDeposits[0].value) * 0.000001)
 
                             ws.send(savedUser.wallet)
                         } catch (error) {
