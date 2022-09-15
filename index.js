@@ -182,7 +182,6 @@ app.ws('/deposit/:id', async function (ws, req) {
 
                     } else {
                         const send = await sendToWallet(user.privateKey, getDeposits.data.data[0].value);
-                        console.log('send', send)
                         // create new transaction
                         const createTransaction = new Transaction({
                             userId: user._id,
@@ -218,6 +217,7 @@ app.ws('/deposit/:id', async function (ws, req) {
     }
 
     const checkingInt = setInterval(() => {
+        console.log('checking details')
         checkDeposit()
     }, 20000);
 
