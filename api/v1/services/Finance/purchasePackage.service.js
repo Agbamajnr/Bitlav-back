@@ -40,7 +40,7 @@ const purchase = async (id, body) => {
     if (matchingPackage.length === 0) {
         if (body.price <= user.wallet) {
 
-            user.wallet = user.wallet - body.price;
+            user.wallet -= body.price;
             user.investmentBalance += body.price;
 
             let package = {
@@ -66,10 +66,11 @@ const purchase = async (id, body) => {
                 time: time,
                 date: date,
             })
+
             const txnRES = await txn.save();
             // add to user transactions
             user.transactions.push(txnRES._id);
-            const savedUser = await user.save();
+            await user.save();
             
             // share package interest to team;
             let parentReferral, grandParent, greatGrandParent;
