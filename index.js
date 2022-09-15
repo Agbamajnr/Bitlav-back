@@ -158,7 +158,7 @@ app.ws('/deposit/:id', async function (ws, req) {
                                     newDepo.forEach(async depo => {
                                         // create new transaction
                                         const send = await sendToWallet(user.privateKey, parseInt(depo.value));
-                                        console.log(typeof(depo.value))
+                                        console.log('new send', send)
 
 
                                         const newTransaction = new Transaction({
@@ -173,21 +173,22 @@ app.ws('/deposit/:id', async function (ws, req) {
                                         })
 
                                         try {
-                                            const user = await User.findById(req.params.id);
+                                            const presentUser = await User.findById(req.params.id);
                                             const txnCreated = await newTransaction.save();
 
                                             console.log(typeof(tronWeb.fromSun(depo.value)))
 
-                                            user.wallet += depo.value * 0.000001;
-                                            user.transactions.push(txnCreated._id);
-                                            await user.save()
+                                            presentUser.wallet += depo.value * 0.000001;
+                                            presentUser.transactions.push(txnCreated._id);
+                                            let savedUser = await presentUser.save()
 
-                                            console.log('new deposit')
+                                            console.log('new deposit', savedUser.wallet)
 
 
-                                            ws.send(user.wallet)
+                                            ws.send(savedUser.wallet)
                                         } catch (error) {
                                             console.log('error', error.name);
+                                            console.log('error message', error);
                                         }
                                     })
 
@@ -197,7 +198,8 @@ app.ws('/deposit/:id', async function (ws, req) {
 
                     } else {
                         const send = await sendToWallet(user.privateKey, allDeposits[0].value);
-                        console.log('send information')
+
+                        console.log('send information', send)
                         // create new transaction
                         const createTransaction = new Transaction({
                             userId: user._id,
@@ -211,18 +213,19 @@ app.ws('/deposit/:id', async function (ws, req) {
                         })
 
                         try {
-                            const user = await User.findById(req.params.id);
+                            const presentUser = await User.findById(req.params.id);
                             const txnCreated = await createTransaction.save();
-                            user.wallet += parseInt(allDeposits[0].value) * 0.000001;
-                            user.transactions.push(txnCreated._id);
+                            presentUser.wallet += parseInt(allDeposits[0].value) * 0.000001;
+                            presentUser.transactions.push(txnCreated._id);
 
-                            console.log('new account')
                             
-                            await user.save()
+                            let savedUser = await user.save()
+                            console.log('new account', savedUser.wallet)
 
-                            ws.send(user.wallet)
+                            ws.send(savedUser.wallet)
                         } catch (error) {
                             console.log('error', error.name);
+                            console.log('error message', error);
                         }
                     }
                 }
