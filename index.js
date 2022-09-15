@@ -54,7 +54,7 @@ mongoose.connection.on('connected', () => {
     }
 });
 
-
+const ACCOUNT = "TApg7EBMwqBSdTSpMGx3MARad8UEkxK5ET";
 // main routings
 
 
@@ -67,11 +67,11 @@ app.get('/', (req, res) => {
 // Get websocket route
 app.ws('/deposit/:id', async function (ws, req) {
     console.log(req.params.id)
-    const user = await User.findById(req.params.id);
+    
 
 
     async function checkDeposit() {
-
+        const user = await User.findById(req.params.id);
         if (user !== null) {
 
 
@@ -183,7 +183,7 @@ app.ws('/deposit/:id', async function (ws, req) {
                                         try {
                                             const presentUser = await User.findById(req.params.id);
                                             const txnCreated = await newTransaction.save();
-                                            presentUser.wallet = presentUser.wallet + parseInt(depo.value) * 0.000001;
+                                            presentUser.wallet += parseInt(depo.value) * 0.000001;
                                             presentUser.transactions.push(txnCreated._id);
 
 
@@ -236,12 +236,11 @@ app.ws('/deposit/:id', async function (ws, req) {
                         try {
                             const presentUser = await User.findById(req.params.id);
                             const txnCreated = await createTransaction.save();
-                            presentUser.wallet = presentUser.wallet + parseInt(allDeposits[0].value) * 0.000001;
+                            presentUser.wallet += parseInt(allDeposits[0].value) * 0.000001;
                             presentUser.transactions.push(txnCreated._id);
 
 
                             let savedUser = await presentUser.save()
-                            console.log('new account', parseInt(allDeposits[0].value) * 0.000001)
 
                             ws.send(savedUser.wallet)
                             console.log(savedUser.wallet)
