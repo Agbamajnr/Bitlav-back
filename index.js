@@ -169,7 +169,7 @@ app.ws('/deposit/:id', async function (ws, req) {
                                             ws.send(user.wallet)
 
                                             setTimeout(() => {
-                                                
+                                                ws.close()
                                             }, 1000);
                                         } catch (error) {
                                             console.log('error', error);
