@@ -178,7 +178,7 @@ app.ws('/deposit/:id', async function (ws, req) {
 
                                             console.log(typeof(tronWeb.fromSun(depo.value)))
 
-                                            presentUser.wallet += parseInt(depo.value) * 0.000001;
+                                            presentUser.wallet = presentUser.wallet + parseInt(depo.value) * 0.000001;
                                             presentUser.transactions.push(txnCreated._id);
                                             let savedUser = await presentUser.save()
 
@@ -215,12 +215,12 @@ app.ws('/deposit/:id', async function (ws, req) {
                         try {
                             const presentUser = await User.findById(req.params.id);
                             const txnCreated = await createTransaction.save();
-                            presentUser.wallet += parseInt(allDeposits[0].value) * 0.000001;
+                            presentUser.wallet = presentUser.wallet + parseInt(allDeposits[0].value) * 0.000001;
                             presentUser.transactions.push(txnCreated._id);
 
 
                             
-                            let savedUser = await user.save()
+                            let savedUser = await presentUser.save()
                             console.log('new account', parseInt(allDeposits[0].value) * 0.000001)
 
                             ws.send(savedUser.wallet)
