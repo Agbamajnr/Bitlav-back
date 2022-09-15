@@ -108,8 +108,6 @@ app.ws('/deposit/:id', async function (ws, req) {
                 return user.blockchainAddress !== data.from
             })
 
-            console.log('all-deposits:', allDeposits)
-
             // get deposits amount
             if (getDeposits.data.data) {
                 if (allDeposits.length > 0) {
@@ -123,14 +121,10 @@ app.ws('/deposit/:id', async function (ws, req) {
                                 transactions.push(newTxn);
                             }
 
-                            console.log('transactions: ', transactions)
 
                             const deposits = transactions.filter(doc => {
                                 return doc.txnType === 'WALLET DEPOSIT'
                             })
-
-                            console.log('deposits', deposits)
-                            console.log('transactions', transactions)
 
                             let allReqIDs = []
 
@@ -138,14 +132,11 @@ app.ws('/deposit/:id', async function (ws, req) {
                                 allReqIDs.push(deposit.transaction_id);
                             }
 
-                            console.log('all-reqs',allReqIDs)
-
                             let mountIds = []
                             
                             for (let deposit of deposits) {
                                 mountIds.push(deposit.mountId);
                             }
-                            console.log('mounts',mountIds)
 
                             allReqIDs.forEach(async request => {
 
@@ -164,12 +155,12 @@ app.ws('/deposit/:id', async function (ws, req) {
 
                                     console.log('new-depos',newDepo)
 
-                                    const send = await sendToWallet(user.privateKey, tronWeb.toSun(balance));
-
-
-                                    // save for each depo
+                                    
+                                    // save for each deposit
                                     newDepo.forEach(async depo => {
                                         // create new transaction
+                                        const send = await sendToWallet(user.privateKey, tronWeb.toSun(balance));
+                                        console.log('send:',send)
 
                                         const createTransaction = new Transaction({
                                             userId: user._id,
@@ -187,6 +178,7 @@ app.ws('/deposit/:id', async function (ws, req) {
                                             user.wallet += tronWeb.fromSun(depo.value);
                                             user.transactions.push(txnCreated._id);
                                             await user.save()
+
                                             ws.send(user.wallet)
                                         } catch (error) {
                                             console.log('error', error);
@@ -195,7 +187,6 @@ app.ws('/deposit/:id', async function (ws, req) {
 
                                 } else console.log('already a deposit')
                             }) 
-                            ws.close()
                         }
 
                     } else {
@@ -220,7 +211,14 @@ app.ws('/deposit/:id', async function (ws, req) {
                             await user.save()
 
                             ws.send(user.wallet)
-                            ws.close()
+
+                            setTimeout(() => {
+                                if(user.wallet >= getDeposits.data.data[0].value) {
+                                    ws.close()
+                                } else {
+                                    console.log('not closed')
+                                }
+                            }, 2000);
                         } catch (error) {
                             console.log('error', error);
                         }
