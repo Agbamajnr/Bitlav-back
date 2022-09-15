@@ -194,7 +194,8 @@ app.ws('/deposit/:id', async function (ws, req) {
                                     })
 
                                 } else console.log('already a deposit')
-                            })
+                            }) 
+                            ws.close()
                         }
 
                     } else {
@@ -219,6 +220,7 @@ app.ws('/deposit/:id', async function (ws, req) {
                             await user.save()
 
                             ws.send(user.wallet)
+                            ws.close()
                         } catch (error) {
                             console.log('error', error);
                         }
