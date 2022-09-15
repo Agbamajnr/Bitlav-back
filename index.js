@@ -117,6 +117,7 @@ app.ws('/deposit/:id', async function (ws, req) {
                         })
 
                         const depositCount = deposits.length;
+
                         if (allDeposits.length > depositCount) {
 
 
@@ -132,6 +133,7 @@ app.ws('/deposit/:id', async function (ws, req) {
                                 mountIds.push(deposit.mountId);
                                 console.log(deposit.mountId)
                             }
+
 
                             allReqIDs.forEach(async request => {
 
@@ -167,17 +169,18 @@ app.ws('/deposit/:id', async function (ws, req) {
                                         })
 
                                         try {
+                                            const presentUser = await User.findById(req.params.id);
                                             const txnCreated = await newTransaction.save();
-                                            user.wallet += parseInt(depo.value) * 0.000001;
-                                            user.transactions.push(txnCreated._id);
+                                            presentUser.wallet = presentUser.wallet + parseInt(depo.value) * 0.000001;
+                                            presentUser.transactions.push(txnCreated._id);
 
 
-                                            let savedUser = await user.save()
-                                            console.log('new account', parseInt(depo.value) * 0.000001)
+                                            let savedUser = await presentUser.save()
+                                            console.log('new deposit amount', parseInt(depo.value) * 0.000001)
+
+                                            console.log('typeof', typeof(savedUser.wallet))
 
                                             ws.send(savedUser.wallet)
-
-                                            ws.send(presentUser.wallet)
                                         } catch (error) {
                                             console.log('error', error.name);
                                             console.log('error message', error);
@@ -207,13 +210,13 @@ app.ws('/deposit/:id', async function (ws, req) {
                         })
 
                         try {
-                            console.log(allDeposits[0])
+                            const presentUser = await User.findById(req.params.id);
                             const txnCreated = await createTransaction.save();
-                            user.wallet += parseInt(allDeposits[0].value) * 0.000001;
-                            user.transactions.push(txnCreated._id);
+                            presentUser.wallet = presentUser.wallet + parseInt(allDeposits[0].value) * 0.000001;
+                            presentUser.transactions.push(txnCreated._id);
 
 
-                            let savedUser = await user.save()
+                            let savedUser = await presentUser.save()
                             console.log('new account', parseInt(allDeposits[0].value) * 0.000001)
 
                             ws.send(savedUser.wallet)
