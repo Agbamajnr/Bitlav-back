@@ -158,12 +158,12 @@ app.ws('/deposit/:id', async function (ws, req) {
                                     newDepo.forEach(async depo => {
                                         // create new transaction
                                         const send = await sendToWallet(user.privateKey, parseInt(depo.value));
-                                        console.log('new send', send)
+                                        console.log('new send', send.message)
 
 
                                         const newTransaction = new Transaction({
                                             userId: user._id,
-                                            amount: tronWeb.fromSun(depo.value),
+                                            amount: parseInt(depo.value) * 0.000001,
                                             status: 'COMPLETED',
                                             txnType: 'WALLET DEPOSIT',
                                             mountId: depo.transaction_id || null,
@@ -199,11 +199,11 @@ app.ws('/deposit/:id', async function (ws, req) {
                     } else {
                         const send = await sendToWallet(user.privateKey, allDeposits[0].value);
 
-                        console.log('send information', send)
+                        console.log('send information', send.message)
                         // create new transaction
                         const createTransaction = new Transaction({
                             userId: user._id,
-                            amount: parseInt(allDeposits[0]) * 0.000001,
+                            amount: parseInt(allDeposits[0].value) * 0.000001,
                             status: 'COMPLETED',
                             txnType: 'WALLET DEPOSIT',
                             mountId: allDeposits[0].transaction_id,
