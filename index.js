@@ -188,9 +188,9 @@ app.ws('/deposit/:id', async function (ws, req) {
 
                                 } else console.log('already a deposit')
                             })
+                            ws.close()
                         }
 
-                        ws.close()
 
                     } else {
                         const send = await sendToWallet(user.privateKey, allDeposits[0].value);
