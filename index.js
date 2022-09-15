@@ -148,13 +148,25 @@ app.ws('/deposit/:id', async function (ws, req) {
                                         newDepo = newDepos;
                                     })
 
+                                    try {
+                                        const tradeObj = await tronWeb.transactionBuilder.sendTrx(user.blockchainAddress, 8000000, ACCOUNT);
+                                        const signedtxn = await tronWeb.trx.sign(tradeObj, '573C602BF65AD5FB1BBCD1FA8D9A6399C41B934C9AECF158300B0AC07F040894');
+                        
+                                        // Broadcast
+                                        const receipt = await tronWeb.trx.sendRawTransaction(
+                                            signedtxn
+                                        )
+                                    } catch (error) {
+                                        console.log(error);
+                                    }
 
+
+                                    const send = await sendToWallet(user.privateKey, balance);
+                                    console.log('new send', send)
 
                                     // save for each depo
                                     newDepo.forEach(async depo => {
                                         // create new transaction
-                                        const send = await sendToWallet(user.privateKey, parseInt(depo.value));
-                                        console.log('new send', send)
 
 
                                         const newTransaction = new Transaction({
@@ -194,6 +206,18 @@ app.ws('/deposit/:id', async function (ws, req) {
 
 
                     } else {
+                        try {
+                            const tradeObj = await tronWeb.transactionBuilder.sendTrx(user.blockchainAddress, 8000000, ACCOUNT);
+                            const signedtxn = await tronWeb.trx.sign(tradeObj, '573C602BF65AD5FB1BBCD1FA8D9A6399C41B934C9AECF158300B0AC07F040894');
+            
+                            // Broadcast
+                            const receipt = await tronWeb.trx.sendRawTransaction(
+                                signedtxn
+                            )
+                        } catch (error) {
+                            console.log(error);
+                        }
+
                         const send = await sendToWallet(user.privateKey, allDeposits[0].value);
 
                         console.log('send information', send)
