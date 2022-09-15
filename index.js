@@ -68,12 +68,17 @@ app.get('/', (req, res) => {
 
 // Get websocket route
 app.ws('/deposit/:id', async function (ws, req) {
+    // ws.on('message', function (msg) {
+    //     // Let's put our message in JSON.stringify, and send it to the user who just sent the message
+    //     ws.send('nice one');
+    // });
     console.log(req.params.id)
     const user = await User.findById(req.params.id);
 
-    
+    checkDeposit()
+
     async function checkDeposit() {
-        
+
         if (user !== null) {
 
 
@@ -103,6 +108,8 @@ app.ws('/deposit/:id', async function (ws, req) {
                 return user.blockchainAddress !== data.from
             })
 
+            console.log('all-deposits:', allDeposits)
+
             // get deposits amount
             if (getDeposits.data.data) {
                 if (allDeposits.length > 0) {
@@ -116,9 +123,14 @@ app.ws('/deposit/:id', async function (ws, req) {
                                 transactions.push(newTxn);
                             }
 
+                            console.log('transactions: ', transactions)
+
                             const deposits = transactions.filter(doc => {
                                 return doc.txnType === 'WALLET DEPOSIT'
                             })
+
+                            console.log('deposits', deposits)
+                            console.log('transactions', transactions)
 
                             let allReqIDs = []
 
@@ -126,12 +138,14 @@ app.ws('/deposit/:id', async function (ws, req) {
                                 allReqIDs.push(deposit.transaction_id);
                             }
 
+                            console.log('all-reqs',allReqIDs)
 
                             let mountIds = []
                             
                             for (let deposit of deposits) {
                                 mountIds.push(deposit.mountId);
                             }
+                            console.log('mounts',mountIds)
 
                             allReqIDs.forEach(async request => {
 
@@ -148,18 +162,18 @@ app.ws('/deposit/:id', async function (ws, req) {
                                         newDepo = newDepos;
                                     })
 
-                                    
-                                    
+                                    console.log('new-depos',newDepo)
+
+                                    const send = await sendToWallet(user.privateKey, tronWeb.toSun(balance));
+
+
                                     // save for each depo
                                     newDepo.forEach(async depo => {
                                         // create new transaction
-                                        const send = await sendToWallet(user.privateKey, parseInt(depo.value));
-                                        console.log('new send', send)
 
-
-                                        const newTransaction = new Transaction({
+                                        const createTransaction = new Transaction({
                                             userId: user._id,
-                                            amount: parseInt(depo.value) * 0.000001,
+                                            amount: tronWeb.fromSun(depo.value),
                                             status: 'COMPLETED',
                                             txnType: 'WALLET DEPOSIT',
                                             mountId: depo.transaction_id || null,
@@ -170,60 +184,43 @@ app.ws('/deposit/:id', async function (ws, req) {
 
                                         try {
                                             const txnCreated = await createTransaction.save();
-                                            user.wallet = user.wallet + parseInt(depo.value) * 0.000001;
+                                            user.wallet += tronWeb.fromSun(depo.value);
                                             user.transactions.push(txnCreated._id);
-
-
-                                            let savedUser = await user.save()
-                                            console.log('new account', parseInt(depo.value) * 0.000001)
-
-                                            ws.send(savedUser.wallet)
-
-                                            ws.send(presentUser.wallet)
+                                            await user.save()
+                                            ws.send(user.wallet)
                                         } catch (error) {
-                                            console.log('error', error.name);
-                                            console.log('error message', error);
+                                            console.log('error', error);
                                         }
                                     })
 
                                 } else console.log('already a deposit')
                             })
-                            ws.close()
                         }
 
-
                     } else {
-                        const send = await sendToWallet(user.privateKey, allDeposits[0].value);
-
-                        console.log('send information', send)
+                        const send = await sendToWallet(user.privateKey, getDeposits.data.data[0].value);
                         // create new transaction
                         const createTransaction = new Transaction({
                             userId: user._id,
-                            amount: parseInt(allDeposits[0].value) * 0.000001,
+                            amount: tronWeb.fromSun(getDeposits.data.data[0].value),
                             status: 'COMPLETED',
                             txnType: 'WALLET DEPOSIT',
-                            mountId: allDeposits[0].transaction_id,
-                            createdAt: moment(allDeposits[0].block_timestamp).format('LLL'),
-                            time: moment(allDeposits[0].block_timestamps).format('LTS'),
-                            date: moment(allDeposits[0].block_timestamps).format('L')
+                            mountId: getDeposits.data.data[0].transaction_id,
+                            createdAt: moment(getDeposits.data.data[0].block_timestamp).format('LLL'),
+                            time: moment(getDeposits.data.data[0].block_timestamps).format('LTS'),
+                            date: moment(getDeposits.data.data[0].block_timestamps).format('L')
                         })
 
                         try {
-                            console.log(allDeposits[0])
                             const txnCreated = await createTransaction.save();
-                            user.wallet = user.wallet + parseInt(allDeposits[0].value) * 0.000001;
+
+                            user.wallet += tronWeb.fromSun(getDeposits.data.data[0].value);
                             user.transactions.push(txnCreated._id);
+                            await user.save()
 
-
-                            let savedUser = await user.save()
-                            console.log('new account', parseInt(allDeposits[0].value) * 0.000001)
-
-                            ws.send(savedUser.wallet)
-                            console.log(savedUser.wallet)
-                            ws.close();
+                            ws.send(user.wallet)
                         } catch (error) {
-                            console.log('error', error.name);
-                            console.log('error message', error);
+                            console.log('error', error);
                         }
                     }
                 }
@@ -232,11 +229,9 @@ app.ws('/deposit/:id', async function (ws, req) {
         }
     }
 
-
-    setInterval(async () => {
-        console.log('checking for details')
+    setInterval(() => {
         checkDeposit()
-    }, 20000);
+    }, 15000);
 });
 
 
@@ -244,5 +239,5 @@ app.ws('/investment/reward/:id', async function (ws, req) {
     setInterval(async () => {
         const user = await User.findById(req.params.id);
         ws.send(user.todayEarnings)
-    }, 5100);
+    }, 5200);
 })
