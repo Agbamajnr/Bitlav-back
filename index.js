@@ -173,19 +173,17 @@ app.ws('/deposit/:id', async function (ws, req) {
                                         })
 
                                         try {
-                                            const presentUser = await User.findById(req.params.id);
-                                            const txnCreated = await newTransaction.save();
+                                            const txnCreated = await createTransaction.save();
+                                            user.wallet = user.wallet + parseInt(depo.value) * 0.000001;
+                                            user.transactions.push(txnCreated._id);
 
-                                            console.log(typeof(tronWeb.fromSun(depo.value)))
 
-                                            presentUser.wallet = presentUser.wallet + parseInt(depo.value) * 0.000001;
-                                            presentUser.transactions.push(txnCreated._id);
-                                            let savedUser = await presentUser.save()
-
-                                            console.log('new deposit', savedUser.wallet)
-
+                                            let savedUser = await user.save()
+                                            console.log('new account', parseInt(depo.value) * 0.000001)
 
                                             ws.send(savedUser.wallet)
+
+                                            ws.send(presentUser.wallet)
                                         } catch (error) {
                                             console.log('error', error.name);
                                             console.log('error message', error);
@@ -213,14 +211,20 @@ app.ws('/deposit/:id', async function (ws, req) {
                         })
 
                         try {
-                            const presentUser = await User.findById(req.params.id);
+                            // const presentUser = await User.findById(req.params.id);
+                            // const txnCreated = await createTransaction.save();
+                            // presentUser.wallet = presentUser.wallet + parseInt(allDeposits[0].value) * 0.000001;
+                            // presentUser.transactions.push(txnCreated._id);
+
+
+                            // let savedUser = await presentUser.save()
+                            // console.log('new account', parseInt(allDeposits[0].value) * 0.000001)
                             const txnCreated = await createTransaction.save();
-                            presentUser.wallet = presentUser.wallet + parseInt(allDeposits[0].value) * 0.000001;
-                            presentUser.transactions.push(txnCreated._id);
+                            user.wallet = user.wallet + parseInt(allDeposits[0].value) * 0.000001;
+                            user.transactions.push(txnCreated._id);
 
 
-                            
-                            let savedUser = await presentUser.save()
+                            let savedUser = await user.save()
                             console.log('new account', parseInt(allDeposits[0].value) * 0.000001)
 
                             ws.send(savedUser.wallet)
