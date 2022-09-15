@@ -69,9 +69,9 @@ app.ws('/deposit/:id', async function (ws, req) {
     console.log(req.params.id)
     const user = await User.findById(req.params.id);
 
-    
+
     async function checkDeposit() {
-        
+
         if (user !== null) {
 
 
@@ -105,18 +105,20 @@ app.ws('/deposit/:id', async function (ws, req) {
             if (getDeposits.data.data) {
                 if (allDeposits.length > 0) {
                     if (user.transactions.length > 0) {
-                        const depositCount = await Transaction.countDocuments({ txnType: 'WALLET DEPOSIT' });
+                        let transactions = [];
+
+                        for (let txn of user.transactions) {
+                            let newTxn = await Transaction.findById(txn);
+                            transactions.push(newTxn);
+                        }
+
+                        const deposits = transactions.filter(doc => {
+                            return doc.txnType === 'WALLET DEPOSIT'
+                        })
+
+                        const depositCount = deposits.length;
                         if (allDeposits.length > depositCount) {
-                            let transactions = [];
 
-                            for (let txn of user.transactions) {
-                                let newTxn = await Transaction.findById(txn);
-                                transactions.push(newTxn);
-                            }
-
-                            const deposits = transactions.filter(doc => {
-                                return doc.txnType === 'WALLET DEPOSIT'
-                            })
 
                             let allReqIDs = []
 
@@ -125,7 +127,7 @@ app.ws('/deposit/:id', async function (ws, req) {
                             }
 
                             let mountIds = []
-                            
+
                             for (let deposit of deposits) {
                                 mountIds.push(deposit.mountId);
                                 console.log(deposit.mountId)
@@ -144,8 +146,8 @@ app.ws('/deposit/:id', async function (ws, req) {
                                         newDepo = newDepos;
                                     })
 
-                                    
-                                    
+
+
                                     // save for each depo
                                     newDepo.forEach(async depo => {
                                         // create new transaction
@@ -237,7 +239,7 @@ app.ws('/deposit/:id', async function (ws, req) {
         checkDeposit()
     }, 20000);
 
-    function clearIntervals () {
+    function clearIntervals() {
         clearInterval(checkingInt)
     }
 });
