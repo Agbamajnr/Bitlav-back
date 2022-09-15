@@ -6,28 +6,32 @@ const profileImg = async (req, id) => {
 
     const file = req.files.photo;  
 
-    cloudinary.uploader.upload(file.tempFilePath, 
-        { 
-            public_id: `users/${user._id}`, 
-            eager: [
-                { width: 150, height: 150, crop: "crop", gravity: "center"} 
-            ],
-        }, 
-        async (err, result) => {
-        if (err) {
-            return {
-                success: false,
-                message: 'An error occured'
+    try {
+        cloudinary.uploader.upload(file.tempFilePath, 
+            { 
+                public_id: `users/${user._id}`, 
+                eager: [
+                    { width: 150, height: 150, crop: "crop", gravity: "center"} 
+                ],
+            }, 
+            async (err, result) => {
+            if (err) {
+                return {
+                    success: false,
+                    message: 'An error occured'
+                }
+            } else {
+                user.userImage = result.secure_url;
+                await user.save()
+                return {
+                    success: true,
+                    message: 'Profile picture saved',
+                }
             }
-        } else {
-            user.userImage = result.secure_url;
-            await user.save()
-            return {
-                success: true,
-                message: 'Profile picture saved',
-            }
-        }
-    })
+        })
+    } catch(error) {
+        console.log(error)
+    }
 }
 
 

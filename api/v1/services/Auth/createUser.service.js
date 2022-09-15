@@ -69,7 +69,8 @@ const run_service = async (currentDate, body) => {
             transactions: [],
             privateKey: privateKey,
             blockchainAddress: address,
-            dateJoined: currentDate
+            dateJoined: currentDate,
+            newUser: true
         };
 
         const user = new User(data)
@@ -104,14 +105,7 @@ const run_service = async (currentDate, body) => {
             } catch (error) {
                 console.log(error);
             }
-
-            // const tradeObj = await tronWeb.transactionBuilder.sendTrx(ACCOUNT, 3000000, result.blockchainAddress);
-            // const signedtxn = await tronWeb.trx.sign(tradeObj, result.privateKey);
-
-            // // Broadcast
-            // const receipt = await tronWeb.trx.sendRawTransaction(
-            //     signedtxn
-            // )
+            
             return {
                 success: true,
                 error: null,

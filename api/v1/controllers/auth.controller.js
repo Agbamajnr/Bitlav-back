@@ -55,8 +55,12 @@ const getUser = async (req, res) => {
     const user = await User.findById(req.user);
 
     if (user !== null) {
-        
         const { privateKey, password, escrow, ...info } = user.toJSON()
+        if(user.newUser === true) {
+            user.newUser = false;
+            await user.save();
+            info.newUser = true;
+        }
         res.status(200).send(info)
     } else {
         res.status(404).send({

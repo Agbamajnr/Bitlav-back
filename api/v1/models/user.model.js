@@ -94,6 +94,10 @@ const userSchema = new Schema(
         dateJoined: {
             type: String,
             required: true
+        },
+        newUser: {
+            type: Boolean,
+            required: true
         }
     }
 );
