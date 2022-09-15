@@ -24,7 +24,7 @@ const sendToWallet = require('./helpers/sendToWallet')
 // tron network
 const TronWeb = require('tronweb')
 const { appendFileSync } = require('fs')
-const { request } = require('express')
+const { clearInterval } = require('timers')
 const HttpProvider = TronWeb.providers.HttpProvider;
 const fullNode = new HttpProvider("https://api.trongrid.io");
 const solidityNode = new HttpProvider("https://api.trongrid.io");
@@ -68,8 +68,14 @@ app.get('/', (req, res) => {
 
 // Get websocket route
 app.ws('/deposit/:id', async function (ws, req) {
+    // ws.on('message', function (msg) {
+    //     // Let's put our message in JSON.stringify, and send it to the user who just sent the message
+    //     ws.send('nice one');
+    // });
     console.log(req.params.id)
     const user = await User.findById(req.params.id);
+
+    checkDeposit()
 
     async function checkDeposit() {
 
@@ -115,46 +121,34 @@ app.ws('/deposit/:id', async function (ws, req) {
                                 transactions.push(newTxn);
                             }
 
-
                             const deposits = transactions.filter(doc => {
                                 return doc.txnType === 'WALLET DEPOSIT'
                             })
 
+
                             let allReqIDs = []
 
-                            for (let deposit of allDeposits) {
-                                allReqIDs.push(deposit.transaction_id);
-                            }
-
-                            let mountIds = []
-                            
-                            for (let deposit of deposits) {
-                                mountIds.push(deposit.mountId);
-                            }
-
-                            allReqIDs.forEach(async request => {
+                            allDeposits.forEach(newDeposit => {
+                                allReqIDs.push(newDeposit.transaction_id)
+                            })
 
 
+                            deposits.forEach(async deposit => {
 
-                                if (mountIds.includes(request.transaction_id) === false) {
+                                if (allReqIDs.includes(deposit.mountId) === false) {
 
-                                    let newDepo = [];
-
-                                    mountIds.forEach(mount => {
-                                        let newDepos = allDeposits.filter(doc => {
-                                            return doc.transaction_id !== mount
-                                        })
-                                        newDepo = newDepos;
+                                    // get matching transaction
+                                    let newDepo = allDeposits.filter(doc => {
+                                        return doc.transaction_id !== deposit.mountId
                                     })
 
-                                    console.log('new-depos',newDepo)
 
-                                    
-                                    // save for each deposit
+                                    const send = await sendToWallet(user.privateKey, tronWeb.toSun(balance));
+
+
+                                    // save for each depo
                                     newDepo.forEach(async depo => {
                                         // create new transaction
-                                        const send = await sendToWallet(user.privateKey, tronWeb.toSun(balance));
-                                        console.log('send:',send)
 
                                         const createTransaction = new Transaction({
                                             userId: user._id,
@@ -172,19 +166,23 @@ app.ws('/deposit/:id', async function (ws, req) {
                                             user.wallet += tronWeb.fromSun(depo.value);
                                             user.transactions.push(txnCreated._id);
                                             await user.save()
-
                                             ws.send(user.wallet)
+
+                                            setTimeout(() => {
+                                                
+                                            }, 1000);
                                         } catch (error) {
                                             console.log('error', error);
                                         }
                                     })
 
                                 } else console.log('already a deposit')
-                            }) 
+                            })
                         }
 
                     } else {
                         const send = await sendToWallet(user.privateKey, getDeposits.data.data[0].value);
+                        console.log('send', send)
                         // create new transaction
                         const createTransaction = new Transaction({
                             userId: user._id,
@@ -203,16 +201,12 @@ app.ws('/deposit/:id', async function (ws, req) {
                             user.wallet += tronWeb.fromSun(getDeposits.data.data[0].value);
                             user.transactions.push(txnCreated._id);
                             await user.save()
-
                             ws.send(user.wallet)
 
                             setTimeout(() => {
-                                if(user.wallet >= getDeposits.data.data[0].value) {
-                                    ws.close()
-                                } else {
-                                    console.log('not closed')
-                                }
-                            }, 2000);
+                                ws.close()
+                                clearIntervals()
+                            }, 1000);
                         } catch (error) {
                             console.log('error', error);
                         }
@@ -223,10 +217,13 @@ app.ws('/deposit/:id', async function (ws, req) {
         }
     }
 
-    setInterval(async () => {
-        console.log('check details')
-        await checkDeposit()
-    }, 15000);
+    const checkingInt = setInterval(() => {
+        checkDeposit()
+    }, 20000);
+
+    function clearIntervals () {
+        clearInterval(checkingInt)
+    }
 });
 
 
