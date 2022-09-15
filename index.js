@@ -68,14 +68,8 @@ app.get('/', (req, res) => {
 
 // Get websocket route
 app.ws('/deposit/:id', async function (ws, req) {
-    // ws.on('message', function (msg) {
-    //     // Let's put our message in JSON.stringify, and send it to the user who just sent the message
-    //     ws.send('nice one');
-    // });
     console.log(req.params.id)
     const user = await User.findById(req.params.id);
-
-    checkDeposit()
 
     async function checkDeposit() {
 
@@ -229,8 +223,9 @@ app.ws('/deposit/:id', async function (ws, req) {
         }
     }
 
-    setInterval(() => {
-        checkDeposit()
+    setInterval(async () => {
+        console.log('check details')
+        await checkDeposit()
     }, 15000);
 });
 
