@@ -68,10 +68,6 @@ app.get('/', (req, res) => {
 
 // Get websocket route
 app.ws('/deposit/:id', async function (ws, req) {
-    // ws.on('message', function (msg) {
-    //     // Let's put our message in JSON.stringify, and send it to the user who just sent the message
-    //     ws.send('nice one');
-    // });
     console.log(req.params.id)
     const user = await User.findById(req.params.id);
 
@@ -194,6 +190,8 @@ app.ws('/deposit/:id', async function (ws, req) {
                             })
                         }
 
+                        ws.close()
+
                     } else {
                         const send = await sendToWallet(user.privateKey, allDeposits[0].value);
 
@@ -211,14 +209,7 @@ app.ws('/deposit/:id', async function (ws, req) {
                         })
 
                         try {
-                            // const presentUser = await User.findById(req.params.id);
-                            // const txnCreated = await createTransaction.save();
-                            // presentUser.wallet = presentUser.wallet + parseInt(allDeposits[0].value) * 0.000001;
-                            // presentUser.transactions.push(txnCreated._id);
-
-
-                            // let savedUser = await presentUser.save()
-                            // console.log('new account', parseInt(allDeposits[0].value) * 0.000001)
+                            console.log(allDeposits[0])
                             const txnCreated = await createTransaction.save();
                             user.wallet = user.wallet + parseInt(allDeposits[0].value) * 0.000001;
                             user.transactions.push(txnCreated._id);
@@ -228,6 +219,8 @@ app.ws('/deposit/:id', async function (ws, req) {
                             console.log('new account', parseInt(allDeposits[0].value) * 0.000001)
 
                             ws.send(savedUser.wallet)
+                            console.log(savedUser.wallet)
+                            ws.close();
                         } catch (error) {
                             console.log('error', error.name);
                             console.log('error message', error);
