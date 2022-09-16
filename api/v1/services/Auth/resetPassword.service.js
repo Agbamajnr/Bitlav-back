@@ -33,7 +33,7 @@ const resetPwd = async (userEmail) => {
         
         if(result) {
             // Encrypt
-            let encryptedPwd = CryptoJS.AES.encrypt(result.password, 'bitlav').toString();
+            let encryptedPwd = CryptoJS.AES.encrypt(password, 'bitlav').toString();
             return {
                 success: true,
                 password: encryptedPwd,

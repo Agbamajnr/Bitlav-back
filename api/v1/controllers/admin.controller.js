@@ -30,7 +30,6 @@ const infos = async (req, res) => {
         }
     })
 
-    console.log(withdrawalsCount, userCount, addedDepo)
 
     res.send({
         users: userCount,

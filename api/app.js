@@ -16,17 +16,15 @@ setInterval(async () => {
     const allUsers = await User.find();
     allUsers.forEach(async (user) => {
         if (user.currentPackage !== 'Starter') {
-            let currentPackage = user.packages.filter(plan => {
-                return user.currentPackage === plan.name
+            let purchasedPackage = user.packages.filter(plan => {
+                return plan.name !== 'Starter'
             })
             user.wallet += user.todayEarnings;
 
             user.packages.forEach(pack => {
-                if(pack.name === currentPackage[0].name) {
-                    pack.amountEarned += user.todayEarnings;
-                }
+                pack.amountEarned += pack.amountInvested * plan.dailyReturns / 100;
             })
-            
+
             await user.save()
 
             // share package interest to team;
@@ -78,15 +76,16 @@ setInterval(async () => {
     const allUsers = await User.find();
     allUsers.forEach(async (user) => {
         if (user.currentPackage !== 'Starter') {
-            let currentPackage = user.packages.filter(plan => {
-                return user.currentPackage === plan.name
+            let purchasedPackage = user.packages.filter(plan => {
+                return plan.name !== 'Starter'
             })
+            purchasedPackage.forEach(async plan => {
+                let dailyReward = plan.amountInvested * plan.dailyReturns / 100;
 
-            let dailyReward = currentPackage[0].amountInvested * currentPackage[0].dailyReturns / 100;
-
-            let sec5Reward = dailyReward / 17280;
-            user.todayEarnings += sec5Reward;
-            await user.save();
+                let sec5Reward = dailyReward / 17280;
+                user.todayEarnings += sec5Reward;
+                await user.save();
+            })
         }
     })
 }, 5000);

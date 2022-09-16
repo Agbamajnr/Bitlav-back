@@ -39,7 +39,6 @@ const approve = async (body, id) => {
     }
 
     let processedAmount = withdrawalRxp.amount - calcPercentage(withdrawalRxp.amount, 5)
-    console.log(processedAmount)
 
     // deduct money from 
     if (body.response === 'APPROVED') {
@@ -99,8 +98,6 @@ const approve = async (body, id) => {
             await user.save()
             await withdrawalRxp.save();
             await txn.save();
-
-            console.log(send)
 
             return {
                 success: false,
