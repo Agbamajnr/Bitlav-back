@@ -74,36 +74,31 @@ const getWithdrawal = async (req, res) => {
 
 
 const getTickets = async (req, res) => {
-    if (req.body.fingerprint !== 'BITLAV2023ADMINONPOMO0x50432135') {
-        res.status(401).send({
-            message: 'Invalid Admin signature'
+    const issues = []
+    try {
+        const list = await Ticket.find();
+        list.forEach(async (ticket) => {
+            const user = await User.findById(ticket.userId);
+            let data = {
+                name: user.fname + ' ' + user.lname,
+                date: ticket.dateCreated,
+                time: ticket.timeCreated,
+                email: user.email,
+                subject: ticket.subject,
+                description: ticket.desc,
+                ticketId: ticket.publicId,
+                id: ticket._id
+            }
+
+            issues.push(data)
         })
-    } else {
-        const issues = []
-        try {
-            const list = await Ticket.find();
-            list.forEach(async (ticket) => {
-                const user = await User.findById(ticket.userId);
-                let data = {
-                    name: user.fname + ' ' + user.lname,
-                    date: ticket.dateCreated,
-                    time: ticket.timeCreated,
-                    email: user.email,
-                    subject: ticket.subject,
-                    description: ticket.desc,
-                    ticketId: ticket.publicId,
-                    id: ticket._id
-                }
-
-                issues.push(data)
-            })
-        } catch (error) {
-            console.log(error.name)
-        }
-
-        res.send(issues)
+    } catch (error) {
+        console.log(error.name)
     }
+
+    res.send(issues)
 }
+
 
 const deleteTicket = async (req, res) => {
     if (req.body.fingerprint !== 'BITLAV2023ADMINONPOMO0x50432135') {
