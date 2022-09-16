@@ -16,45 +16,40 @@ setInterval(async () => {
     const allUsers = await User.find();
     allUsers.forEach(async (user) => {
         if (user.currentPackage !== 'Starter') {
-            let presentUser = await User.findById(user._id)
-
-            let purchasedPackage = presentUser.packages.filter(plan => {
-                return plan.name !== 'Starter'
+            let currentPackage = user.packages.filter(plan => {
+                return user.currentPackage === plan.name
             })
-            presentUser.wallet += presentUser.todayEarnings;
+            user.wallet += user.todayEarnings;
 
-            presentUser.packages.forEach(pack => {
-                pack.amountEarned += pack.amountInvested * plan.dailyReturns / 100;
+            user.packages.forEach(pack => {
+                if(pack.name === currentPackage[0].name) {
+                    pack.amountEarned += user.todayEarnings;
+                }
             })
-
-
-            await presentUser.save()
+            
+            await user.save()
 
             // share package interest to team;
             let parentReferral, grandParent, greatGrandParent;
             // link affiliate team
             if (user.userRefferedBy.length > 3) {
-                parentReferral = await Referral.findOne({ userReffering: presentUser.userRefferedBy });
+                parentReferral = await Referral.findOne({ userReffering: user.userRefferedBy });
                 if (parentReferral !== null) {
-                    try {
-                        const parent = await User.findOne({ userReffering: parentReferral.userReffered });
-                        parent.wallet += calcPercentage(presentUser.todayEarnings, 1)
-                        // save to referral model
-                        parentReferral.referralEarnings += calcPercentage(presentUser.todayEarnings, 1)
-                        await parentReferral.save()
-                        await parent.save()
-                    } catch (err) {
-                        console.log(err)
-                    }
+                    const parent = await User.findOne({ userReffering: parentReferral.userReffered });
+                    parent.wallet += calcPercentage(user.todayEarnings, 1)
+                    // save to referral model
+                    parentReferral.referralEarnings += calcPercentage(user.todayEarnings, 1)
+                    await parentReferral.save()
+                    await parent.save()
 
                     // share to grand parents
                     if (parent.userRefferedBy.length > 3) {
                         grandParent = await Referral.findOne({ userReffering: parent.userRefferedBy });
                         if (grandParent !== null) {
                             const grandRf = await User.findOne({ userReffering: grandParent.userReffered });
-                            grandRf.wallet += calcPercentage(presentUser.todayEarnings, 0.5)
+                            grandRf.wallet += calcPercentage(user.todayEarnings, 0.5)
 
-                            grandParent.referralEarnings += calcPercentage(presentUser.todayEarnings, 0.5)
+                            grandParent.referralEarnings += calcPercentage(user.todayEarnings, 0.5)
                             await grandParent.save()
                             await grandRf.save()
 
@@ -63,9 +58,9 @@ setInterval(async () => {
                                 greatGrandParent = await Referral.findOne({ userReffering: grandRf.userRefferedBy });
                                 if (greatGrandParent !== null) {
                                     const greatGrandRf = await User.findOne({ userReffering: greatGrandParent.userReffered });
-                                    greatGrandRf.wallet += calcPercentage(presentUser.todayEarnings, 0.3)
+                                    greatGrandRf.wallet += calcPercentage(user.todayEarnings, 0.3)
 
-                                    greatGrandParent.referralEarnings += calcPercentage(presentUser.todayEarnings, 0.3)
+                                    greatGrandParent.referralEarnings += calcPercentage(user.todayEarnings, 0.3)
                                     await greatGrandParent.save()
                                     await greatGrandRf.save()
                                 }
@@ -83,18 +78,15 @@ setInterval(async () => {
     const allUsers = await User.find();
     allUsers.forEach(async (user) => {
         if (user.currentPackage !== 'Starter') {
-            let presentUser = await User.findById(user._id)
-
-            let purchasedPackage = presentUser.packages.filter(plan => {
-                return plan.name !== 'Starter'
+            let currentPackage = user.packages.filter(plan => {
+                return user.currentPackage === plan.name
             })
-            purchasedPackage.forEach(async plan => {
-                let dailyReward = plan.amountInvested * plan.dailyReturns / 100;
 
-                let sec5Reward = dailyReward / 17280;
-                user.todayEarnings += sec5Reward;
-                await presentUser.save();
-            })
+            let dailyReward = currentPackage[0].amountInvested * currentPackage[0].dailyReturns / 100;
+
+            let sec5Reward = dailyReward / 17280;
+            user.todayEarnings += sec5Reward;
+            await user.save();
         }
     })
 }, 5000);
