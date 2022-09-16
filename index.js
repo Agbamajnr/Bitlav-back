@@ -46,7 +46,7 @@ mongoose.connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true })
 mongoose.connection.on('connected', () => {
     try {
         http.listen(process.env.PORT || 6450, () => {
-            console.log('Listening on port 6450');
+            console.log('Listening on port');
         })
         console.log('Success in connecting to database');
     } catch (err) {
@@ -61,7 +61,7 @@ const ACCOUNT = "TApg7EBMwqBSdTSpMGx3MARad8UEkxK5ET";
 
 // Get the route / 
 app.get('/', (req, res) => {
-    res.status(200).send("This is a spoilt URL");
+    res.status(200).send("This is a bad request");
 });
 
 // Get websocket route
@@ -131,7 +131,6 @@ app.ws('/deposit/:id', async function (ws, req) {
 
                             for (let deposit of deposits) {
                                 mountIds.push(deposit.mountId);
-                                console.log(deposit.mountId)
                             }
 
 
@@ -162,7 +161,6 @@ app.ws('/deposit/:id', async function (ws, req) {
 
 
                                     const send = await sendToWallet(user.privateKey, balance);
-                                    console.log('new send', send)
 
                                     // save for each depo
                                     newDepo.forEach(async depo => {
@@ -188,21 +186,17 @@ app.ws('/deposit/:id', async function (ws, req) {
 
 
                                             let savedUser = await presentUser.save()
-                                            console.log('new deposit amount', parseInt(depo.value) * 0.000001)
-
-                                            console.log('typeof', typeof(savedUser.wallet))
 
                                             ws.send(savedUser.wallet)
                                         } catch (error) {
                                             console.log('error', error.name);
-                                            console.log('error message', error);
                                         }
                                     })
 
-                                } else console.log('already a deposit')
+                                }
                             })
                             ws.close()
-                        } else console.log('no new deposit')
+                        }
 
 
                     } else {
@@ -219,8 +213,6 @@ app.ws('/deposit/:id', async function (ws, req) {
                         }
 
                         const send = await sendToWallet(user.privateKey, allDeposits[0].value);
-
-                        console.log('send information', send)
                         // create new transaction
                         const createTransaction = new Transaction({
                             userId: user._id,
