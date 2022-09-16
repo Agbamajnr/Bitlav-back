@@ -77,7 +77,7 @@ const getTickets = async (req, res) => {
     const issues = []
     try {
         const list = await Ticket.find();
-        list.forEach(async (ticket) => {
+        for (let ticket of list) {
             const user = await User.findById(ticket.userId);
             let data = {
                 name: user.fname + ' ' + user.lname,
@@ -89,14 +89,14 @@ const getTickets = async (req, res) => {
                 ticketId: ticket.publicId,
                 id: ticket._id
             }
-
             issues.push(data)
-        })
+        }
+        
+        res.send(issues)
     } catch (error) {
         console.log(error.name)
     }
 
-    res.send(issues)
 }
 
 
