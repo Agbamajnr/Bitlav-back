@@ -107,7 +107,8 @@ const deleteTicket = async (req, res) => {
         })
     } else {
         try {
-            const ticket = await Ticket.findByIdAndDelete(req.body.id)
+            const ticket = await Ticket.findByIdAndRemove(req.body.id)
+            console.log(req.body.id)
 
             res.send({
                 message: 'Ticket deleted'
