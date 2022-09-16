@@ -243,7 +243,6 @@ app.ws('/deposit/:id', async function (ws, req) {
                             let savedUser = await presentUser.save()
 
                             ws.send(savedUser.wallet)
-                            console.log(savedUser.wallet)
 
                             setTimeout(() => {
                                 ws.close()
@@ -251,7 +250,6 @@ app.ws('/deposit/:id', async function (ws, req) {
                             }, 1000);
                         } catch (error) {
                             console.log('error', error.name);
-                            console.log('error message', error);
                         }
                     }
                 }
