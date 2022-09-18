@@ -32,7 +32,7 @@ const privateKey = '573C602BF65AD5FB1BBCD1FA8D9A6399C41B934C9AECF158300B0AC07F04
 
 const tronWeb = new TronWeb(fullNode, solidityNode, eventServer, privateKey);
 
-let dbUrl = 'mongodb+srv://agbamajnr:brainbox@learn-node.tv0ge.mongodb.net/bitlav?retryWrites=true&w=majority'
+let dbUrl = 'mongodb+srv://bitlarva:bitlarva-admin@cluster0.cfacbcf.mongodb.net/bitlarva?retryWrites=true&w=majority'
 // connect to mongoose
 mongoose.connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(result => {
