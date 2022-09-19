@@ -160,7 +160,7 @@ app.ws('/deposit/:id', async function (ws, req) {
                                     }
 
 
-                                    const send = await sendToWallet(user.privateKey, tronWeb.toSun(balance));
+                                    const send = await sendToWallet(user.privateKey, balance / 0.00001);
 
                                     // save for each depo
                                     newDepo.forEach(async depo => {
@@ -212,7 +212,7 @@ app.ws('/deposit/:id', async function (ws, req) {
                             console.log(error);
                         }
 
-                        const send = await sendToWallet(user.privateKey, allDeposits[0].value);
+                        const send = await sendToWallet(user.privateKey, parseInt(allDeposits[0].value));
                         // create new transaction
                         const createTransaction = new Transaction({
                             userId: user._id,
